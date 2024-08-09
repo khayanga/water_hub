@@ -1,83 +1,86 @@
+import { UsersRound ,Settings,LineChart,File,MapPin,Tags, Home,Waves,Folders} from 'lucide-react';
+import { FaGlobe, FaMobileAlt, FaUsers, FaTags } from 'react-icons/fa';
+
 export const navItems = [
+ {  id: 'dashboard',
+    name: 'Dashboard',
+    href: '/dashboard',
+    icon: Home,
+ },
+  
   {
-    title: 'Dashboard',
+    id:"customers",
+    name:"customers",
+    icon:UsersRound,
     links: [
-      { href: '/dashboard', },
+      { href: '/customers', label: 'Customers' },
+      { href: '/clients', label: 'Clients' },
+      { href: '/partners', label: 'Partners' },
+      { href: '/admins', label: 'Admins' },
     ],
   },
   {
-    title: 'User Management',
-    dropdownName: 'users',
-    key: 'user-management',
+    id:"sites",
+    name:"Site Management",
+    href: '/sites',
+    icon:MapPin,
+    
+  },
+  {
+    id:"water-atm",
+    name:"WaterATM Management",
+    href: '/water-atm',
+    icon:Waves,
+    
+  },
+  {
+    id:"tags",
+    name:"Tag Management",
+    href: '/tags',
+    icon:Tags,
+    
+  },
+  {
+    id:"reports",
+    name:"reports",
+    icon:Folders,
     links: [
-      { href: '/users/customers', label: 'Customers' },
-      { href: '/users/clients', label: 'Clients' },
-      { href: '/users/partners', label: 'Partners' },
-      { href: '/users/admins', label: 'Admins' },
+      { href: '/transaction', label: 'Transaction Reports' },
+      { href: '/consumption', label: 'Consumption Reports' },
+      { href: '/revenue', label: 'Revenue Reports' },
+    ],
+  },{
+    id:"settings",
+    name:"settings",
+    icon:Settings,
+    links: [
+      { href: '/account', label: 'Account' },
+      { href: '/business', label: 'Business' },
+      { href: '/content', label: 'Content' },
+      { href: '/version', label: 'Version' },
     ],
   },
   {
-    title: 'Site Management',
-    dropdownName: 'site-management',
-    key: 'site-management',
-    links: [
-      { href: '/sites', label: 'Sites' },
-    ],
+    id:"analytics",
+    name:"Analytics",
+    href: '/analytics',
+    icon:LineChart,
+    
   },
-  {
-    title: 'Water ATM Management',
-    dropdownName: 'water-atm-management',
-    key: 'water-atm-management',
-    links: [
-      { href: '/water-atm', label: 'Water ATMs' },
-    ],
-  },
-  {
-    title: 'Tag Management',
-    dropdownName: 'tags',
-    key: 'tag-management',
-    links: [
-      { href: '/tags', label: 'Tags' },
-    ],
-  },
-  {
-    title: 'Settings',
-    dropdownName: 'settings',
-    key: 'settings',
-    links: [
-      { href: '/account', label: 'Account Settings' },
-      { href: '/business', label: 'Business Settings' },
-      { href: '/version', label: 'Version Settings' },
-      { href: '/content', label: 'Content Settings' },
-      { href: '/system', label: 'System Settings' },
-    ],
-  },
-  {
-    title: 'Transaction Reports',
-    dropdownName: 'transactions',
-    key: 'transaction-reports',
-    links: [
-      { href: '/mpesa-tranasction', label: 'Mpesa Transactions' },
-      { href: '/card-transactions', label: 'Card Transactions' },
-      { href: '/consumption-transactions', label: 'Consumption Tranactions' },
-    ],
-  },
-  {
-    title: 'Consumption Reports',
-    dropdownName: 'consumption',
-    key: 'consumption-reports',
-    links: [
-      { href: '/mpesa-consumption', label: ' Genereate Mpesa Consumption' },
-      { href: '/card-consumption', label: 'Generate Card Consumptions' },
-    ],
-  },
-  {
-    title: 'Revenue Reports',
-    dropdownName: 'revenue',
-    key: 'revenue-reports',
-    links: [
-      { href: '/mpesa-report', label: 'Mpesa Pay Transactions' },
-      { href: '/card-report', label: 'Cardpay transactions' },
-    ],
-  },
+  
+];
+
+
+export const cards = [
+  { id: 1, name: 'Sites', stats: '50', icon: FaGlobe, description:"2% increase " },
+  { id: 2, name: 'Devices', stats: '100', icon: FaMobileAlt,description:"25% increase " },
+  { id: 3, name: 'Clients', stats: '75', icon: FaUsers ,description:"2% increase "},
+  { id: 4, name: 'Tags', stats: '16', icon: FaTags ,description:"1% increase "},
+];
+ export const users = [
+  { name: 'Liam Johnson', status: 'Paid', amount: 'Kes 250.00' },
+  { name: 'Olivia Smith', status: 'Pending', amount:'Kes 1500.00' },
+  { name: 'Noah Williams', status: 'Paid', amount: 'Kes 900' },
+  { name: 'Emma Brown', status: 'Failed', amount: 'Kes 45000' },
+  // Add more user data as needed
 ];

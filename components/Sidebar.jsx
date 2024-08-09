@@ -1,54 +1,64 @@
 "use client";
 
-import { useState } from 'react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { Package2 } from 'lucide-react';
+
 import Link from 'next/link';
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+
 import { navItems } from '@/data';
 
 const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState('');
-
-  const toggleDropdown = (name) => {
-    setOpenDropdown(openDropdown === name ? '' : name);
-  };
+  
 
   return (
-    <div className="h-full bg-gray-800 text-white w-64 space-y-6 px-4 py-4">
-      <div className="flex items-center space-x-2">
-        <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
-      </div>
-      <nav>
-        <ul className="space-y-2">
-          {navItems.map((item) => (
-            <li key={item.key}>
-              <button 
-                className="w-full text-left py-2 px-4 rounded flex justify-between items-center hover:bg-gray-700"
-                onClick={() => toggleDropdown(item.dropdownName)}
-              >
-                {item.title}
-                {openDropdown === item.dropdownName ? (
-                  <FaChevronUp className="w-2 h-2" />
-                ) : (
-                  <FaChevronDown className="w-2 h-2" />
-                )}
-              </button>
-              {openDropdown === item.dropdownName && (
-                <ul className="space-y-1 pl-4 mt-1">
-                  {item.links.map((link) => (
-                    <li key={link.href}>
-                      <Link href={link.href} className="block py-2 px-4 rounded hover:bg-gray-700">
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
-        </ul> 
+
+    <aside className='fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex px-2 '>
+      <nav className='flex flex-col items-center gap-4 px-2 sm:py-5 '>
+      <Link
+            href="/dashboard"
+            className="group flex h-9 w-9 shrink-0 items-center justify-center bg-blue-500  gap-2 rounded-full  text-lg font-semibold text-white md:h-8 md:w-8 md:text-base"
+          >
+            <Package2 className="h-4 w-4 transition-all group-hover:scale-110" />
+            
+      </Link>
+      <TooltipProvider>
+      {navItems.map((item) => (
+        <Tooltip key={item.id}>
+          <TooltipTrigger asChild>
+            <Link
+              href={item.href || '#'} // Use `href` if available, otherwise '#'
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+            >
+              <item.icon className="h-5 w-5" />
+              <span className="sr-only">{item.name}</span>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent className="flex flex-col space-y-1" side="right">
+            {item.links ? (
+              <ul className="space-y-1">
+                {item.links.map((link, index) => (
+                  <li key={index}>
+                    <Link href={link.href} className="block px-4 py-2 hover:bg-blue-500 hover:text-foreground rounded">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <span>{item.name}</span> // Display the name if no links array
+            )}
+          </TooltipContent>
+        </Tooltip>
+      ))}
+    </TooltipProvider>
       </nav>
-    </div>
+
+    </aside>
   );
 };
 
