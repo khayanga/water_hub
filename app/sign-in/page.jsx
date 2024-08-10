@@ -9,7 +9,7 @@ const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
+  const [signInWithEmailAndPassword, userCredential, loading, errorFirebase] = useSignInWithEmailAndPassword(auth);
   const router = useRouter();
 
   const handleSignIn = async (event) => {
@@ -17,14 +17,29 @@ const SignIn = () => {
     setError('');
 
     try {
-      await signInWithEmailAndPassword(email, password);
-      sessionStorage.setItem('user', JSON.stringify(auth.currentUser));
-      setEmail('');
-      setPassword('');
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 2500);
+      // Attempt to sign in the user
+      const result = await signInWithEmailAndPassword(email, password);
+
+      // Check if the sign-in was successful
+      if (result.user) {
+        // Log the user's email to the console with a success message
+        console.log(`${result.user.email} successfully logged in`);
+
+        // Store the user data in session storage
+        sessionStorage.setItem('user', JSON.stringify(result.user));
+        setEmail('');
+        setPassword('');
+        
+        // Redirect to the dashboard after a short delay
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 2500);
+      } else {
+        // Handle cases where sign-in is unsuccessful
+        setError('Failed to sign in. Please check your email and password.');
+      }
     } catch (error) {
+      // Handle and display any error that occurs during the sign-in process
       setError('Failed to sign in. Please check your email and password.');
       console.error('Error signing in:', error);
     }
@@ -52,8 +67,9 @@ const SignIn = () => {
         <button 
           onClick={handleSignIn}
           className="w-full p-3 bg-indigo-600 rounded text-white hover:bg-indigo-500"
+          disabled={loading} // Disable the button while loading
         >
-          Sign In
+          {loading ? 'Signing In...' : 'Sign In'}
         </button>
       </div>
     </div>
