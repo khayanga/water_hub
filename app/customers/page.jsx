@@ -30,7 +30,8 @@ import Sidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import { customers as initialCustomers } from "@/data";
+
+import Useravatar from "@/components/Useravatar";
 
 const Page = () => {
   const [formData, setFormData] = useState({
@@ -44,8 +45,9 @@ const Page = () => {
 
   const [customers, setCustomers] = useState(() => {
     const storedCustomers = localStorage.getItem("customers");
-    return storedCustomers ? JSON.parse(storedCustomers) : initialCustomers;
+    return storedCustomers ? JSON.parse(storedCustomers) : [];
   });
+  
 
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [formError, setFormError] = useState("");
@@ -142,23 +144,7 @@ const Page = () => {
             </Button>
           </div>
           <div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Avatar>
-                  <span className="sr-only">Toggle user menu</span>
-                  <AvatarFallback>TY</AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Profile</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <Link href="/sign-in">
-                  <DropdownMenuItem>Logout</DropdownMenuItem>
-                </Link>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Useravatar/>
           </div>
         </div>
 

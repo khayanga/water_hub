@@ -84,10 +84,10 @@ export const cards = [
   { name: 'Emma Brown', status: 'Failed', amount: 'Kes 45000' },
   // Add more user data as needed
 ];
-export const customers = [
-  { name: 'Liam Johnson', status: 'Active', contact: '010002344566',date:"22-07-2024" },
-  { name: 'Olivia Smith', status: 'Active',  contact: '010002344566',date:"22-07-2024" },
-  { name: 'Noah Williams', status: 'Active',  contact: '010002344566',date:"22-07-2024" },
-  { name: 'Emma Brown', status: 'Active',  contact: '010002344566' ,date:"22-07-2024"},
-  // Add more user data as needed
-];
+// export const customers = [
+//   { name: 'Liam Johnson', status: 'Active', contact: '010002344566',date:"22-07-2024" },
+//   { name: 'Olivia Smith', status: 'Active',  contact: '010002344566',date:"22-07-2024" },
+//   { name: 'Noah Williams', status: 'Active',  contact: '010002344566',date:"22-07-2024" },
+//   { name: 'Emma Brown', status: 'Active',  contact: '010002344566' ,date:"22-07-2024"},
+//   // Add more user data as needed
+// ];

@@ -1,19 +1,13 @@
-'use client'
+"use client";
+import { AuthProvider } from "@/components/AuthProvider";
 
-
-export default function Home() {
-
-  
-
+export default function Home({ Component, pageProps }) {
   return (
-    <main className="min-h-screen p-4">
+    <AuthProvider>
+      <Component {...pageProps} />
+    </AuthProvider>
+  );
+}
 
-      
-
-
-      
-    </main>
-  )
-};
 
 

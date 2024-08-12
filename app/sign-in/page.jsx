@@ -4,42 +4,35 @@ import { useState } from 'react';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/app/firebase/config';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/components/AuthProvider'; // Import useAuth
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [signInWithEmailAndPassword, userCredential, loading, errorFirebase] = useSignInWithEmailAndPassword(auth);
+  const [signInWithEmailAndPassword,  loading] = useSignInWithEmailAndPassword(auth);
   const router = useRouter();
+  const { login } = useAuth(); // Get the login function from AuthProvider
 
   const handleSignIn = async (event) => {
     event.preventDefault();
     setError('');
 
     try {
-      // Attempt to sign in the user
       const result = await signInWithEmailAndPassword(email, password);
 
-      // Check if the sign-in was successful
       if (result.user) {
-        // Log the user's email to the console with a success message
         console.log(`${result.user.email} successfully logged in`);
 
-        // Store the user data in session storage
-        sessionStorage.setItem('user', JSON.stringify(result.user));
+        // Store the user data in session storage via AuthProvider's login method
+        login(result.user);
+        
         setEmail('');
         setPassword('');
-        
-        // Redirect to the dashboard after a short delay
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 2500);
       } else {
-        // Handle cases where sign-in is unsuccessful
         setError('Failed to sign in. Please check your email and password.');
       }
     } catch (error) {
-      // Handle and display any error that occurs during the sign-in process
       setError('Failed to sign in. Please check your email and password.');
       console.error('Error signing in:', error);
     }
@@ -67,7 +60,7 @@ const SignIn = () => {
         <button 
           onClick={handleSignIn}
           className="w-full p-3 bg-indigo-600 rounded text-white hover:bg-indigo-500"
-          disabled={loading} // Disable the button while loading
+          disabled={loading}
         >
           {loading ? 'Signing In...' : 'Sign In'}
         </button>
