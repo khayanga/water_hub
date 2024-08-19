@@ -1,5 +1,4 @@
-"use client";
-
+"use client"
 import React, { useState, useEffect } from "react";
 import { ArrowDownUp, Ellipsis } from "lucide-react";
 import {
@@ -50,19 +49,19 @@ const Page = () => {
     image: null,
   });
 
-  const [customers, setCustomers] = useState(() => {
-    const storedCustomers = localStorage.getItem("customers");
-    return storedCustomers ? JSON.parse(storedCustomers) : [];
+  const [clients, setClients] = useState(() => {
+    const storedClients = localStorage.getItem("clients");
+    return storedClients ? JSON.parse(storedClients) : [];
   });
 
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedClient, setSelectedClient] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [formError, setFormError] = useState("");
-  const [editCustomer, setEditCustomer] = useState(null);
+  const [editClient, setEditClient] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem("customers", JSON.stringify(customers));
-  }, [customers]);
+    localStorage.setItem("clients", JSON.stringify(clients));
+  }, [clients]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -87,7 +86,7 @@ const Page = () => {
       return;
     }
 
-    const newCustomer = {
+    const newClient = {
       name: formData.name,
       email: formData.email,
       status: "Active",
@@ -95,12 +94,11 @@ const Page = () => {
       date: new Date().toLocaleDateString(),
     };
 
-    setCustomers((prevCustomers) => {
-      const updatedCustomers = [...prevCustomers, newCustomer];
-      return updatedCustomers;
+    setClients((prevClients) => {
+      const updatedClients = [...prevClients, newClient];
+      return updatedClients;
     });
 
-    // Reset the form data to its initial state
     setFormData({
       name: "",
       email: "",
@@ -113,11 +111,11 @@ const Page = () => {
   };
 
   const handleDelete = (index) => {
-    setCustomers((prevCustomers) => {
-      const updatedCustomers = prevCustomers.filter(
-        (customer, i) => i !== index
+    setClients((prevClients) => {
+      const updatedClients = prevClients.filter(
+        (client, i) => i !== index
       );
-      return updatedCustomers;
+      return updatedClients;
     });
   };
 
@@ -127,7 +125,7 @@ const Page = () => {
       direction = "descending";
     }
 
-    const sortedCustomers = [...customers].sort((a, b) => {
+    const sortedClients = [...clients].sort((a, b) => {
       if (a[key] < b[key]) {
         return direction === "ascending" ? -1 : 1;
       }
@@ -138,45 +136,41 @@ const Page = () => {
     });
 
     setSortConfig({ key, direction });
-    setCustomers(sortedCustomers);
+    setClients(sortedClients);
   };
 
-  const openDialog = (customer) => {
-    setSelectedCustomer(customer);
+  const openDialog = (client) => {
+    setSelectedClient(client);
   };
 
   const closeDialog = () => {
-    setSelectedCustomer(null);
+    setSelectedClient(null);
   };
 
   const handleEditChange = (e) => {
     const { id, value } = e.target;
-    setEditCustomer((prev) => ({
+    setEditClient((prev) => ({
       ...prev,
       [id]: value,
     }));
   };
-  
-  
 
-  const openEditDialog = (customer) => {
-    setEditCustomer(customer);
+  const openEditDialog = (client) => {
+    setEditClient(client);
   };
 
   const closeEditDialog = () => {
-    setEditCustomer(null);
+    setEditClient(null);
   };
 
   const saveChanges = () => {
-    setCustomers((prevCustomers) =>
-      prevCustomers.map((customer) =>
-        customer.email === editCustomer.email ? { ...editCustomer, contact: editCustomer.phone } : customer
+    setClients((prevClients) =>
+      prevClients.map((client) =>
+        client.email === editClient.email ? { ...editClient, contact: editClient.phone } : client
       )
     );
     closeEditDialog();
   };
-  
-  
 
   return (
     <div className="w-11/12 mx-auto">
@@ -185,9 +179,9 @@ const Page = () => {
       <div className="p-4 w-full mx-auto">
         <div className="flex flex-row justify-between p-2 w-full">
           <div className="flex flex-row items-center gap-6">
-            <h1 className="font-bold tracking-wider">Customers Management</h1>
+            <h1 className="font-bold tracking-wider">Client Management</h1>
             <Button className="bg-blue-500 px-6 py-1 text-white">
-              {customers.length}
+              {clients.length}
             </Button>
           </div>
           <div>
@@ -196,7 +190,7 @@ const Page = () => {
         </div>
 
         <p className="mt-2 tracking-wider text-sm font-light pl-2 ">
-          Fill in the form below to register a customer.
+          Fill in the form below to register a client.
         </p>
 
         <form className="w-full mt-5 pl-2" onSubmit={handleSubmit}>
@@ -207,7 +201,7 @@ const Page = () => {
               )}
               <div className="flex flex-wrap gap-8 p-2">
                 <div className="space-y-1">
-                  <Label htmlFor="name">Customer Name</Label>
+                  <Label htmlFor="name">Client Name</Label>
                   <Input
                     id="name"
                     type="text"
@@ -217,7 +211,7 @@ const Page = () => {
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="email">Customer Email</Label>
+                  <Label htmlFor="email">Client Email</Label>
                   <Input
                     id="email"
                     type="email"
@@ -227,7 +221,7 @@ const Page = () => {
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="phone">Customer Phone</Label>
+                  <Label htmlFor="phone">Client Phone</Label>
                   <Input
                     id="phone"
                     type="tel"
@@ -269,31 +263,31 @@ const Page = () => {
             </CardContent>
             <CardFooter>
               <Button type="submit" className="bg-blue-500 text-white">
-                Add customer
+                Add client
               </Button>
             </CardFooter>
           </Card>
         </form>
 
         <div className="flex flex-row items-center justify-between gap-6 pl-4 mt-8">
-          <h1 className="font-bold tracking-wide mb-2">Customers List</h1>
+          <h1 className="font-bold tracking-wide mb-2">Clients List</h1>
         </div>
 
         <Card className="ml-4">
           <Table>
-            <TableCaption>A list of all the customers.</TableCaption>
+            <TableCaption>A list of all the clients.</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead onClick={() => sortData("name")}>
                   <div className="flex items-center">
-                    Customer name
+                    Client name
                     <ArrowDownUp
                       size={16}
                       className={`ml-2 ${sortConfig.key === "name" && sortConfig.direction === "ascending" ? "rotate-180" : ""}`}
                     />
                   </div>
                 </TableHead>
-                <TableHead>Customer Email</TableHead>
+                <TableHead>Client Email</TableHead>
                 <TableHead onClick={() => sortData("status")}>
                   <div className="flex items-center">
                     Status
@@ -325,36 +319,30 @@ const Page = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {customers.map((customer, index) => (
+              {clients.map((client, index) => (
                 <TableRow key={index}>
-                  <TableCell >{customer.name}</TableCell>
-                  <TableCell>{customer.email}</TableCell>
-                  <TableCell>{customer.status}</TableCell>
-                  <TableCell>{customer.contact}</TableCell>
-                  <TableCell>{customer.date}</TableCell>
+                  <TableCell className="font-medium">{client.name}</TableCell>
+                  <TableCell>{client.email}</TableCell>
+                  <TableCell>{client.status}</TableCell>
+                  <TableCell>{client.contact}</TableCell>
+                  <TableCell>{client.date}</TableCell>
                   <TableCell>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup="true"
-                          size="icon"
-                          variant="ghost"
-                        >
-                          <Ellipsis className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
+                      <DropdownMenuTrigger>
+                        <Ellipsis size={20} />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Dialog>
-                            <DialogTrigger onClick={() => openEditDialog(customer)}>Edit</DialogTrigger>
-                          </Dialog>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => openDialog(client)}>
+                          View
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(index)}>Delete</DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Dialog>
-                            <DialogTrigger onClick={() => openDialog(customer)}>View</DialogTrigger>
-                          </Dialog>
+                        <DropdownMenuItem onClick={() => openEditDialog(client)}>
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(index)}
+                          
+                        >
+                          Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -365,75 +353,73 @@ const Page = () => {
           </Table>
         </Card>
 
-        {/* Viewing details modal */}
-        {selectedCustomer && (
-          <Dialog open={!!selectedCustomer} onOpenChange={closeDialog}>
+        {selectedClient && (
+          <Dialog open={true} onOpenChange={closeDialog}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>{selectedCustomer.name}</DialogTitle>
+                <DialogTitle>Client Details</DialogTitle>
                 <DialogDescription>
-                  Here are the details of {selectedCustomer.name}.
+                  <p>
+                    <strong>Name:</strong> {selectedClient.name}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {selectedClient.email}
+                  </p>
+                  <p>
+                    <strong>Contact:</strong> {selectedClient.contact}
+                  </p>
+                  <p>
+                    <strong>Date:</strong> {selectedClient.date}
+                  </p>
                 </DialogDescription>
               </DialogHeader>
-              <div>
-                <p><strong>Email:</strong> {selectedCustomer.email}</p>
-                <p><strong>Status:</strong> {selectedCustomer.status}</p>
-                <p><strong>Contact:</strong> {selectedCustomer.contact}</p>
-                <p><strong>Date Added:</strong> {selectedCustomer.date}</p>
-              </div>
+              {/* <DialogClose asChild>
+                <Button className="mt-4">Close</Button>
+              </DialogClose> */}
             </DialogContent>
           </Dialog>
         )}
 
-        {/* Editing details modal */}
-        {editCustomer && (
-          <Dialog open={!!editCustomer} onOpenChange={closeEditDialog}>
+        {editClient && (
+          <Dialog open={true} onOpenChange={closeEditDialog}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Edit {editCustomer.name}</DialogTitle>
+                <DialogTitle>Edit Client Details</DialogTitle>
               </DialogHeader>
-              <form>
-                <div className="space-y-2">
-                  <div className="space-y-1">
-                    <Label htmlFor="editName">Customer Name</Label>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Enter customer's name"
-                      value={editCustomer.name}
-                      onChange={handleEditChange}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="editEmail">Customer Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="email@gmail.com"
-                      value={editCustomer.email}
-                      onChange={handleEditChange}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="editPhone">Customer Phone</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="(+254...)"
-                      value={editCustomer.phone}
-                      onChange={handleEditChange}
-                    />
-                  </div>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="name">Client Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    value={editClient.name}
+                    onChange={handleEditChange}
+                  />
                 </div>
-              </form>
-              <DialogClose asChild>
-                <Button
-                  onClick={saveChanges}
-                  className="mt-4 bg-blue-500 text-white"
-                >
+                <div>
+                  <Label htmlFor="email">Client Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={editClient.email}
+                    onChange={handleEditChange}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Client Phone</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={editClient.phone}
+                    onChange={handleEditChange}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end mt-4">
+                <Button onClick={saveChanges} className="bg-blue-500 text-white">
                   Save Changes
                 </Button>
-              </DialogClose>
+              </div>
             </DialogContent>
           </Dialog>
         )}

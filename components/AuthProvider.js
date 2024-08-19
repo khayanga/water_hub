@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // use 'next/navigation' instead of 'next/router'
+import { useRouter } from "next/navigation";
 
 const AuthContext = createContext();
 
@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Wait for the component to be mounted before accessing sessionStorage or router
+    // Ensure that the component is mounted before accessing sessionStorage or router
     setMounted(true);
   }, []);
 
@@ -21,7 +21,12 @@ export const AuthProvider = ({ children }) => {
       if (userData) {
         setUser(JSON.parse(userData));
       } else {
-        router.push("/sign-in");
+        // Add a try-catch block to handle potential routing errors
+        try {
+          router.push("/sign-in");
+        } catch (error) {
+          console.error("Failed to redirect to sign-in:", error);
+        }
       }
     }
   }, [mounted, router]);
@@ -39,7 +44,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   if (!mounted) {
-    return null; // or a loading spinner if preferred
+    return <div className="">Loading...</div>; // Placeholder content while waiting for the component to mount
   }
 
   return (
@@ -50,4 +55,5 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
 
