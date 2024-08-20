@@ -181,7 +181,7 @@ const Page = () => {
       <div className="p-4 w-full mx-auto">
         <div className="flex flex-row justify-between p-2 w-full">
           <div className="flex flex-row items-center gap-6">
-            <h1 className="font-bold tracking-wider">Partners Management</h1>
+            <h1 className="font-bold tracking-wider">Partner Management</h1>
             <Button className="bg-blue-500 px-6 py-1 text-white">
               {partners.length}
             </Button>
