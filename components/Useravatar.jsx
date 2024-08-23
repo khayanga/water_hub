@@ -34,7 +34,7 @@ const Useravatar = () => {
   return (
     <div className=''>
       <div className="flex flex-row justify-between gap-4">
-        <h2 className='font-bold text md:text-[22px] text-[20px]'>
+        <h2 className='font-bold text md:text-[22px] text-[20px] hidden md:block'>
           Welcome Back, {userName || 'Guest'}
         </h2>
         <DropdownMenu>
