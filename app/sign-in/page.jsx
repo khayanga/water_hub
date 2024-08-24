@@ -11,8 +11,8 @@ const SignIn = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [signInWithEmailAndPassword,  loading] = useSignInWithEmailAndPassword(auth);
-  const router = useRouter();
-  const { login } = useAuth(); // Get the login function from AuthProvider
+  const router = useRouter()
+  const { login } = useAuth(); 
 
   const handleSignIn = async (event) => {
     event.preventDefault();
@@ -24,7 +24,7 @@ const SignIn = () => {
       if (result.user) {
         console.log(`${result.user.email} successfully logged in`);
 
-        // Store the user data in session storage via AuthProvider's login method
+        
         login(result.user);
         
         setEmail('');

@@ -1,21 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { ArrowDownUp, Ellipsis } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import {
   Card,
   CardContent,
@@ -23,15 +8,7 @@ import {
 } from "@/components/ui/card";
 
 import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog";
+
 
 import Sidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";

@@ -58,6 +58,7 @@ export const navItems = [
       { href: '/business', label: 'Business' },
       { href: '/content', label: 'Content' },
       { href: '/version', label: 'Version' },
+      { href: '/system', label: 'System' },
     ],
   },
   {
