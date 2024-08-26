@@ -46,9 +46,10 @@ const Useravatar = () => {
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Profile</DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            <Link href="/account">
             <DropdownMenuItem>Settings</DropdownMenuItem>
+            </Link>
+            
             <DropdownMenuSeparator />
             <Link href="/sign-in">
               <DropdownMenuItem>Logout</DropdownMenuItem>
