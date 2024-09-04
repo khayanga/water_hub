@@ -1,40 +1,51 @@
 'use client';
-
+import Link from 'next/link';
 import { useState } from 'react';
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { auth } from '@/app/firebase/config';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/components/AuthProvider'; // Import useAuth
+import { useAuth } from '@/components/AuthProvider'; 
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [signInWithEmailAndPassword,  loading] = useSignInWithEmailAndPassword(auth);
-  const router = useRouter()
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const { login } = useAuth(); 
 
   const handleSignIn = async (event) => {
     event.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
-      const result = await signInWithEmailAndPassword(email, password);
+      const response = await fetch("https://api.waterhub.africa/api/v1/client/login", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-      if (result.user) {
-        console.log(`${result.user.email} successfully logged in`);
+      const result = await response.json();
 
-        
-        login(result.user);
-        
+      if (response.ok && result.access_token) {
+        console.log(`Access Token: ${result.access_token}`);
+        localStorage.setItem('accessToken', result.access_token); 
+
+        login(result.data);
+
         setEmail('');
         setPassword('');
+        router.push('/dashboard'); 
       } else {
-        setError('Failed to sign in. Please check your email and password.');
+        setError(result.message || 'Failed to sign in. Please check your email and password.');
       }
     } catch (error) {
       setError('Failed to sign in. Please check your email and password.');
       console.error('Error signing in:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,9 +75,15 @@ const SignIn = () => {
         >
           {loading ? 'Signing In...' : 'Sign In'}
         </button>
+
+        <div className="text-gray-400 text-sm mt-4 text-center">
+          Don't have an account? <Link href="/sign-up" className="text-indigo-500 hover:underline">Sign Up</Link>
+        </div>
       </div>
     </div>
   );
 };
 
 export default SignIn;
+
+

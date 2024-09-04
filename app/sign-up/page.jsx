@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/app/firebase/config';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -20,11 +21,10 @@ const SignUp = () => {
       await createUserWithEmailAndPassword(email, password);
       if (user) {
         sessionStorage.setItem('user', JSON.stringify(user));
+        console.log('User signed up successfully:', user);
         setEmail('');
         setPassword('');
-        setTimeout(() => {
-          router.push('/sign-in');
-        }, 2500);
+        router.push('/sign-in');
       }
     } catch (error) {
       setError('Failed to sign up. Please check your email and password.');
@@ -59,10 +59,15 @@ const SignUp = () => {
         >
           {loading ? 'Signing up...' : 'Sign Up'}
         </button>
+        <div className="text-gray-400 text-sm mt-4 text-center">
+          Already have an account? <Link href="/sign-in" className="text-indigo-500 hover:underline">Sign In</Link>
+        </div>
       </div>
     </div>
   );
 };
 
 export default SignUp;
+
+
 

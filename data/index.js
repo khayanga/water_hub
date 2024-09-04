@@ -49,18 +49,8 @@ export const navItems = [
       { href: '/consumption', label: 'Consumption Reports' },
       { href: '/revenue', label: 'Revenue Reports' },
     ],
-  },{
-    id:"settings",
-    name:"settings",
-    icon:Settings,
-    links: [
-      { href: '/account', label: 'Account' },
-      { href: '/business', label: 'Business' },
-      { href: '/content', label: 'Content' },
-      { href: '/version', label: 'Version' },
-      { href: '/system', label: 'System' },
-    ],
   },
+
   {
     id:"analytics",
     name:"Analytics",
@@ -68,6 +58,20 @@ export const navItems = [
     icon:LineChart,
     
   },
+  
+  {
+    id:"settings",
+    name:"settings",
+    icon:Settings,
+    links: [
+      { href: '/account', label: 'Account' },
+      { href: '/business', label: 'Business' },
+      // { href: '/content', label: 'Content' },
+      // { href: '/version', label: 'Version' },
+      { href: '/system', label: 'System' },
+    ],
+  },
+ 
   
 ];
 

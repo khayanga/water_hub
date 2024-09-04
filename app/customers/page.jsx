@@ -39,6 +39,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import Useravatar from "@/components/Useravatar";
+import { getAccessToken } from "@/components/utils/auth";
 
 const Page = () => {
   const [formData, setFormData] = useState({
@@ -50,19 +51,51 @@ const Page = () => {
     image: null,
   });
 
-  const [customers, setCustomers] = useState(() => {
-    const storedCustomers = localStorage.getItem("customers");
-    return storedCustomers ? JSON.parse(storedCustomers) : [];
-  });
+  const [customers, setCustomers] = useState([]);
 
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
-  const [formError, setFormError] = useState("");
-  const [editCustomer, setEditCustomer] = useState(null);
+  const token = getAccessToken();
 
   useEffect(() => {
-    localStorage.setItem("customers", JSON.stringify(customers));
-  }, [customers]);
+    const fetchCustomers = async () => {
+      const token = getAccessToken();
+
+      try {
+        const response = await fetch("https://api.waterhub.africa/api/v1/client/customer/list", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCustomers(data.customers); // Assuming the data contains a 'customers' array
+        } else {
+          setFormError("Failed to fetch customers");
+        }
+      } catch (error) {
+        console.error("Error fetching customers:", error);
+        setFormError("An error occurred while fetching customers.");
+      }
+    };
+
+    fetchCustomers();
+  }, []);
+
+  // const [customers, setCustomers] = useState(() => {
+  //   const storedCustomers = localStorage.getItem("customers");
+  //   return storedCustomers ? JSON.parse(storedCustomers) : [];
+  // });
+
+  // const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
+  const [formError, setFormError] = useState("");
+  // const [editCustomer, setEditCustomer] = useState(null);
+
+  // useEffect(() => {
+  //   localStorage.setItem("customers", JSON.stringify(customers));
+  // }, [customers]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -79,38 +112,38 @@ const Page = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
     
-    if (formData.password !== formData.confirmPassword) {
-      setFormError("Passwords do not match.");
-      return;
-    }
+  //   if (formData.password !== formData.confirmPassword) {
+  //     setFormError("Passwords do not match.");
+  //     return;
+  //   }
 
-    const newCustomer = {
-      name: formData.name,
-      email: formData.email,
-      status: "Active",
-      contact: formData.phone,
-      date: new Date().toLocaleDateString(),
-    };
+  //   const newCustomer = {
+  //     name: formData.name,
+  //     email: formData.email,
+  //     status: "Active",
+  //     contact: formData.phone,
+  //     date: new Date().toLocaleDateString(),
+  //   };
 
-    setCustomers((prevCustomers) => {
-      const updatedCustomers = [...prevCustomers, newCustomer];
-      return updatedCustomers;
-    });
+  //   setCustomers((prevCustomers) => {
+  //     const updatedCustomers = [...prevCustomers, newCustomer];
+  //     return updatedCustomers;
+  //   });
 
-    // Reset the form data to its initial state
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      password: "",
-      confirmPassword: "",
-      image: null,
-    });
-    setFormError("");
-  };
+  //   // Reset the form data to its initial state
+  //   setFormData({
+  //     name: "",
+  //     email: "",
+  //     phone: "",
+  //     password: "",
+  //     confirmPassword: "",
+  //     image: null,
+  //   });
+  //   setFormError("");
+  // };
 
   const handleDelete = (index) => {
     setCustomers((prevCustomers) => {
@@ -121,73 +154,123 @@ const Page = () => {
     });
   };
 
-  const sortData = (key) => {
-    let direction = "ascending";
-    if (sortConfig.key === key && sortConfig.direction === "ascending") {
-      direction = "descending";
+  // const sortData = (key) => {
+  //   let direction = "ascending";
+  //   if (sortConfig.key === key && sortConfig.direction === "ascending") {
+  //     direction = "descending";
+  //   }
+
+  //   const sortedCustomers = [...customers].sort((a, b) => {
+  //     if (a[key] < b[key]) {
+  //       return direction === "ascending" ? -1 : 1;
+  //     }
+  //     if (a[key] > b[key]) {
+  //       return direction === "ascending" ? 1 : -1;
+  //     }
+  //     return 0;
+  //   });
+
+  //   setSortConfig({ key, direction });
+  //   setCustomers(sortedCustomers);
+  // };
+
+  // const openDialog = (customer) => {
+  //   setSelectedCustomer(customer);
+  // };
+
+  // const closeDialog = () => {
+  //   setSelectedCustomer(null);
+  // };
+
+  // const handleEditChange = (e) => {
+  //   const { id, value } = e.target;
+  //   setEditCustomer((prev) => ({
+  //     ...prev,
+  //     [id]: value,
+  //   }));
+  // };
+  
+  
+
+  // const openEditDialog = (customer) => {
+  //   setEditCustomer(customer);
+  // };
+
+  // const closeEditDialog = () => {
+  //   setEditCustomer(null);
+  // };
+
+  // const saveChanges = () => {
+  //   setCustomers((prevCustomers) =>
+  //     prevCustomers.map((customer) =>
+  //       customer.email === editCustomer.email ? { ...editCustomer, contact: editCustomer.phone } : customer
+  //     )
+  //   );
+  //   closeEditDialog();
+  // };
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    if (formData.password !== formData.confirmPassword) {
+      setFormError("Passwords do not match.");
+      return;
     }
+  
+    const newCustomer = {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+    };
+  
 
-    const sortedCustomers = [...customers].sort((a, b) => {
-      if (a[key] < b[key]) {
-        return direction === "ascending" ? -1 : 1;
+   
+  
+    try {
+      const response = await fetch("https://api.waterhub.africa/api/v1/client/customer/store", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // Use the retrieved token
+        },
+        body: JSON.stringify(newCustomer),
+      });
+  
+      const data = await response.json();
+      console.log("API Response:", data);
+  
+      if (response.ok) {
+        setCustomers((prevCustomers) => [...prevCustomers, newCustomer]);
+        
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          password: "",
+          confirmPassword: "",
+          image: null,
+        });
+        setFormError("");
+      } else {
+        setFormError(data.message || "Failed to add customer");
       }
-      if (a[key] > b[key]) {
-        return direction === "ascending" ? 1 : -1;
-      }
-      return 0;
-    });
-
-    setSortConfig({ key, direction });
-    setCustomers(sortedCustomers);
+    } catch (error) {
+      console.error("Error:", error);
+      setFormError("An error occurred while adding the customer.");
+    }
   };
-
-  const openDialog = (customer) => {
-    setSelectedCustomer(customer);
-  };
-
-  const closeDialog = () => {
-    setSelectedCustomer(null);
-  };
-
-  const handleEditChange = (e) => {
-    const { id, value } = e.target;
-    setEditCustomer((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
-  };
-  
-  
-
-  const openEditDialog = (customer) => {
-    setEditCustomer(customer);
-  };
-
-  const closeEditDialog = () => {
-    setEditCustomer(null);
-  };
-
-  const saveChanges = () => {
-    setCustomers((prevCustomers) =>
-      prevCustomers.map((customer) =>
-        customer.email === editCustomer.email ? { ...editCustomer, contact: editCustomer.phone } : customer
-      )
-    );
-    closeEditDialog();
-  };
-  
   
 
   return (
     <div className="w-11/12 mx-auto">
       <Sidebar />
 
-      <div className="p-4 w-full mx-auto">
+      <div className="p-4 w-full mx-auto ">
         <div className="flex flex-row justify-between p-2 w-full">
           <div className="flex flex-row items-center gap-6">
             <h1 className="font-bold tracking-wider">Customers Management</h1>
             <Button className="bg-blue-500 px-6 py-1 text-white">
-              {customers.length}
+              {/* {customers.length} */}
             </Button>
           </div>
           <div>
@@ -366,7 +449,7 @@ const Page = () => {
         </Card>
 
         {/* Viewing details modal */}
-        {selectedCustomer && (
+        {/* {selectedCustomer && (
           <Dialog open={!!selectedCustomer} onOpenChange={closeDialog}>
             <DialogContent>
               <DialogHeader>
@@ -383,10 +466,10 @@ const Page = () => {
               </div>
             </DialogContent>
           </Dialog>
-        )}
+        )} */}
 
         {/* Editing details modal */}
-        {editCustomer && (
+        {/* {editCustomer && (
           <Dialog open={!!editCustomer} onOpenChange={closeEditDialog}>
             <DialogContent>
               <DialogHeader>
@@ -436,7 +519,7 @@ const Page = () => {
               </DialogClose>
             </DialogContent>
           </Dialog>
-        )}
+        )} */}
       </div>
     </div>
   );
