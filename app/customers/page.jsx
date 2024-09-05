@@ -17,12 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -33,11 +28,9 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-
 import Sidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 import Useravatar from "@/components/Useravatar";
 import { getAccessToken } from "@/components/utils/auth";
 
@@ -52,26 +45,33 @@ const Page = () => {
   });
 
   const [customers, setCustomers] = useState([]);
+  const [formError, setFormError] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [editCustomer, setEditCustomer] = useState(null);
 
   const token = getAccessToken();
 
   useEffect(() => {
     const fetchCustomers = async () => {
-      const token = getAccessToken();
-
       try {
-        const response = await fetch("https://api.waterhub.africa/api/v1/client/customer/list", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-        });
-
+        const response = await fetch(
+          "https://api.waterhub.africa/api/v1/client/customer/list?per_page=20",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+  
         if (response.ok) {
           const data = await response.json();
-          setCustomers(data.customers); // Assuming the data contains a 'customers' array
+          console.log("Fetched data:", data);
+          setCustomers(data.data || []); 
         } else {
+          console.error("Error response:", response);
           setFormError("Failed to fetch customers");
         }
       } catch (error) {
@@ -79,24 +79,10 @@ const Page = () => {
         setFormError("An error occurred while fetching customers.");
       }
     };
-
+  
     fetchCustomers();
-  }, []);
-
-  // const [customers, setCustomers] = useState(() => {
-  //   const storedCustomers = localStorage.getItem("customers");
-  //   return storedCustomers ? JSON.parse(storedCustomers) : [];
-  // });
-
-  // const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
-  const [formError, setFormError] = useState("");
-  // const [editCustomer, setEditCustomer] = useState(null);
-
-  // useEffect(() => {
-  //   localStorage.setItem("customers", JSON.stringify(customers));
-  // }, [customers]);
-
+  }, [token]);
+  
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({
@@ -112,136 +98,39 @@ const Page = () => {
     }));
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-    
-  //   if (formData.password !== formData.confirmPassword) {
-  //     setFormError("Passwords do not match.");
-  //     return;
-  //   }
-
-  //   const newCustomer = {
-  //     name: formData.name,
-  //     email: formData.email,
-  //     status: "Active",
-  //     contact: formData.phone,
-  //     date: new Date().toLocaleDateString(),
-  //   };
-
-  //   setCustomers((prevCustomers) => {
-  //     const updatedCustomers = [...prevCustomers, newCustomer];
-  //     return updatedCustomers;
-  //   });
-
-  //   // Reset the form data to its initial state
-  //   setFormData({
-  //     name: "",
-  //     email: "",
-  //     phone: "",
-  //     password: "",
-  //     confirmPassword: "",
-  //     image: null,
-  //   });
-  //   setFormError("");
-  // };
-
-  const handleDelete = (index) => {
-    setCustomers((prevCustomers) => {
-      const updatedCustomers = prevCustomers.filter(
-        (customer, i) => i !== index
-      );
-      return updatedCustomers;
-    });
-  };
-
-  // const sortData = (key) => {
-  //   let direction = "ascending";
-  //   if (sortConfig.key === key && sortConfig.direction === "ascending") {
-  //     direction = "descending";
-  //   }
-
-  //   const sortedCustomers = [...customers].sort((a, b) => {
-  //     if (a[key] < b[key]) {
-  //       return direction === "ascending" ? -1 : 1;
-  //     }
-  //     if (a[key] > b[key]) {
-  //       return direction === "ascending" ? 1 : -1;
-  //     }
-  //     return 0;
-  //   });
-
-  //   setSortConfig({ key, direction });
-  //   setCustomers(sortedCustomers);
-  // };
-
-  // const openDialog = (customer) => {
-  //   setSelectedCustomer(customer);
-  // };
-
-  // const closeDialog = () => {
-  //   setSelectedCustomer(null);
-  // };
-
-  // const handleEditChange = (e) => {
-  //   const { id, value } = e.target;
-  //   setEditCustomer((prev) => ({
-  //     ...prev,
-  //     [id]: value,
-  //   }));
-  // };
-  
-  
-
-  // const openEditDialog = (customer) => {
-  //   setEditCustomer(customer);
-  // };
-
-  // const closeEditDialog = () => {
-  //   setEditCustomer(null);
-  // };
-
-  // const saveChanges = () => {
-  //   setCustomers((prevCustomers) =>
-  //     prevCustomers.map((customer) =>
-  //       customer.email === editCustomer.email ? { ...editCustomer, contact: editCustomer.phone } : customer
-  //     )
-  //   );
-  //   closeEditDialog();
-  // };
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (formData.password !== formData.confirmPassword) {
       setFormError("Passwords do not match.");
       return;
     }
-  
+
     const newCustomer = {
       name: formData.name,
       email: formData.email,
       phone: formData.phone,
     };
-  
 
-   
-  
     try {
-      const response = await fetch("https://api.waterhub.africa/api/v1/client/customer/store", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // Use the retrieved token
-        },
-        body: JSON.stringify(newCustomer),
-      });
-  
+      const response = await fetch(
+        "https://api.waterhub.africa/api/v1/client/customer/store",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(newCustomer),
+        }
+      );
+
       const data = await response.json();
       console.log("API Response:", data);
-  
+
       if (response.ok) {
         setCustomers((prevCustomers) => [...prevCustomers, newCustomer]);
-        
+
         setFormData({
           name: "",
           email: "",
@@ -259,35 +148,144 @@ const Page = () => {
       setFormError("An error occurred while adding the customer.");
     }
   };
+
+
+
+  const handleDelete = async (customerId, index) => {
+    try {
+      const response = await fetch(
+        `https://api.waterhub.africa/api/v1/client/customer/delete/${customerId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (response.ok) {
+       console.log("Customer deleted successfully")
+        setCustomers((prevCustomers) =>
+          prevCustomers.filter((_, i) => i !== index)
+        );
+      } else {
+        // Handle the error case
+        const data = await response.json();
+        console.error("Error deleting customer:", data.message);
+        setFormError(data.message || "Failed to delete customer");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setFormError("An error occurred while deleting the customer.");
+    }
+  };
   
 
+  const sortData = (key) => {
+    let direction = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+
+    const sortedCustomers = [...customers].sort((a, b) => {
+      if (a[key] < b[key]) return direction === "ascending" ? -1 : 1;
+      if (a[key] > b[key]) return direction === "ascending" ? 1 : -1;
+      return 0;
+    });
+
+    setSortConfig({ key, direction });
+    setCustomers(sortedCustomers);
+  };
+  const openDialog = (customer) => {
+        setSelectedCustomer(customer);
+      };
+    
+      const closeDialog = () => {
+        setSelectedCustomer(null);
+      };
+    
+      const handleEditChange = (e) => {
+        const { id, value } = e.target;
+        setEditCustomer((prev) => ({
+          ...prev,
+          [id]: value,
+        }));
+      };
+    
+      const handleEditSubmit = async (e) => {
+        e.preventDefault();
+        if (!editCustomer) return;
+      
+        try {
+          const response = await fetch(
+            `https://api.waterhub.africa/api/v1/client/customer/update/${editCustomer.id}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                name: editCustomer.name,
+                email: editCustomer.email,
+                phone: editCustomer.phone,
+              }),
+            }
+          );
+      
+          if (response.ok) {
+            const updatedCustomer = await response.json();
+            setCustomers((prevCustomers) =>
+              prevCustomers.map((customer) =>
+                customer.id === updatedCustomer.id ? updatedCustomer : customer
+              )
+            );
+            closeEditDialog();
+          } else {
+            const data = await response.json();
+            setFormError(data.message || "Failed to update customer");
+          }
+        } catch (error) {
+          setFormError("An error occurred while updating the customer.");
+        }
+      };
+      
+    
+      const openEditDialog = (customer) => {
+        setEditCustomer(customer);
+      };
+    
+      const closeEditDialog = () => {
+        setEditCustomer(null);
+      };
+    
+  
   return (
     <div className="w-11/12 mx-auto">
       <Sidebar />
 
-      <div className="p-4 w-full mx-auto ">
+      <div className="p-4 w-full mx-auto">
         <div className="flex flex-row justify-between p-2 w-full">
           <div className="flex flex-row items-center gap-6">
             <h1 className="font-bold tracking-wider">Customers Management</h1>
             <Button className="bg-blue-500 px-6 py-1 text-white">
-              {/* {customers.length} */}
+              {customers.length} 
             </Button>
           </div>
           <div>
-            <Useravatar/>
+            <Useravatar />
           </div>
         </div>
 
-        <p className="mt-2 tracking-wider text-sm font-light pl-2 ">
+        <p className="mt-2 tracking-wider text-sm font-light pl-2">
           Fill in the form below to register a customer.
         </p>
 
         <form className="w-full mt-5 pl-2" onSubmit={handleSubmit}>
           <Card>
             <CardContent className="space-y-2">
-              {formError && (
-                <div className="text-red-500 mb-2">{formError}</div>
-              )}
+              {formError && <div className="text-red-500 mb-2">{formError}</div>}
               <div className="flex flex-wrap gap-8 p-2">
                 <div className="space-y-1">
                   <Label htmlFor="name">Customer Name</Label>
@@ -369,54 +367,34 @@ const Page = () => {
               <TableRow>
                 <TableHead onClick={() => sortData("name")}>
                   <div className="flex items-center">
-                    Customer name
+                    Customer Name
                     <ArrowDownUp
                       size={16}
-                      className={`ml-2 ${sortConfig.key === "name" && sortConfig.direction === "ascending" ? "rotate-180" : ""}`}
+                      className={`ml-2 ${
+                        sortConfig.key === "name" &&
+                        sortConfig.direction === "ascending"
+                          ? "rotate-180"
+                          : ""
+                      }`}
                     />
                   </div>
                 </TableHead>
+               
                 <TableHead>Customer Email</TableHead>
-                <TableHead onClick={() => sortData("status")}>
-                  <div className="flex items-center">
-                    Status
-                    <ArrowDownUp
-                      size={16}
-                      className={`ml-2 ${sortConfig.key === "status" && sortConfig.direction === "ascending" ? "rotate-180" : ""}`}
-                    />
-                  </div>
-                </TableHead>
-                <TableHead onClick={() => sortData("contact")}>
-                  <div className="flex items-center">
-                    Contact
-                    <ArrowDownUp
-                      size={16}
-                      className={`ml-2 ${sortConfig.key === "contact" && sortConfig.direction === "ascending" ? "rotate-180" : ""}`}
-                    />
-                  </div>
-                </TableHead>
-                <TableHead onClick={() => sortData("date")}>
-                  <div className="flex items-center">
-                    Date
-                    <ArrowDownUp
-                      size={16}
-                      className={`ml-2 ${sortConfig.key === "date" && sortConfig.direction === "ascending" ? "rotate-180" : ""}`}
-                    />
-                  </div>
-                </TableHead>
+                <TableHead>Contact</TableHead>
+                <TableHead>Date Added</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {customers.map((customer, index) => (
                 <TableRow key={index}>
-                  <TableCell >{customer.name}</TableCell>
+                  <TableCell>{customer.name}</TableCell>
                   <TableCell>{customer.email}</TableCell>
-                  <TableCell>{customer.status}</TableCell>
-                  <TableCell>{customer.contact}</TableCell>
-                  <TableCell>{customer.date}</TableCell>
+                  <TableCell>{customer.phone}</TableCell>
+                  <TableCell>{new Date().toLocaleDateString()}</TableCell>
                   <TableCell>
-                    <DropdownMenu>
+                  <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
                           aria-haspopup="true"
@@ -428,17 +406,18 @@ const Page = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                      <DropdownMenuItem>
+                          <Dialog>
+                            <DialogTrigger onClick={() => openDialog(customer)}>View</DialogTrigger>
+                          </Dialog>
+                        </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Dialog>
                             <DialogTrigger onClick={() => openEditDialog(customer)}>Edit</DialogTrigger>
                           </Dialog>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(index)}>Delete</DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Dialog>
-                            <DialogTrigger onClick={() => openDialog(customer)}>View</DialogTrigger>
-                          </Dialog>
-                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDelete(customer.id, index)}>Delete</DropdownMenuItem>
+                        
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -447,9 +426,8 @@ const Page = () => {
             </TableBody>
           </Table>
         </Card>
-
-        {/* Viewing details modal */}
-        {/* {selectedCustomer && (
+         {/* Viewing details modal */}
+        {selectedCustomer && (
           <Dialog open={!!selectedCustomer} onOpenChange={closeDialog}>
             <DialogContent>
               <DialogHeader>
@@ -460,66 +438,62 @@ const Page = () => {
               </DialogHeader>
               <div>
                 <p><strong>Email:</strong> {selectedCustomer.email}</p>
-                <p><strong>Status:</strong> {selectedCustomer.status}</p>
-                <p><strong>Contact:</strong> {selectedCustomer.contact}</p>
-                <p><strong>Date Added:</strong> {selectedCustomer.date}</p>
-              </div>
+                <p><strong>Phone:</strong> {selectedCustomer.phone}</p>
+                <p><strong>Date Added:</strong> {new Date().toLocaleDateString()}</p>
+               </div>
             </DialogContent>
           </Dialog>
-        )} */}
+        )}
 
         {/* Editing details modal */}
-        {/* {editCustomer && (
+        {editCustomer && (
           <Dialog open={!!editCustomer} onOpenChange={closeEditDialog}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Edit {editCustomer.name}</DialogTitle>
+                <DialogTitle>Edit Customer</DialogTitle>
               </DialogHeader>
-              <form>
-                <div className="space-y-2">
-                  <div className="space-y-1">
-                    <Label htmlFor="editName">Customer Name</Label>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Enter customer's name"
-                      value={editCustomer.name}
-                      onChange={handleEditChange}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="editEmail">Customer Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="email@gmail.com"
-                      value={editCustomer.email}
-                      onChange={handleEditChange}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="editPhone">Customer Phone</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="(+254...)"
-                      value={editCustomer.phone}
-                      onChange={handleEditChange}
-                    />
-                  </div>
+              <form onSubmit={handleEditSubmit}>
+              <div className="space-y-4 p-2">
+                <div className="space-y-1">
+                  <Label htmlFor="editName">Name</Label>
+                  <Input
+                    type="text"
+                    id="name"
+                    value={editCustomer?.name || ""}
+                    onChange={handleEditChange}
+                  />
                 </div>
+                <div className="space-y-1">
+                  <Label htmlFor="editEmail">Email</Label>
+                  <Input
+                    type="email"
+                    id="email"
+                    value={editCustomer?.email || ""}
+                    onChange={handleEditChange}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="editPhone">Phone</Label>
+                  <Input
+                    type="tel"
+                    id="phone"
+                    value={editCustomer?.phone || ""}
+                    onChange={handleEditChange}
+                  />
+                </div>
+              </div>
+
+              <Button
+                 onClick={handleEditSubmit}
+                 className="mt-4 bg-blue-500 text-white"
+               >
+                 Save Changes
+               </Button>
               </form>
-              <DialogClose asChild>
-                <Button
-                  onClick={saveChanges}
-                  className="mt-4 bg-blue-500 text-white"
-                >
-                  Save Changes
-                </Button>
-              </DialogClose>
             </DialogContent>
           </Dialog>
-        )} */}
+        )}
+
       </div>
     </div>
   );
