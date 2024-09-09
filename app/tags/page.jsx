@@ -42,6 +42,7 @@ import Sidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Useravatar from "@/components/Useravatar";
+import { getAccessToken } from "@/components/utils/auth";
 
 const Page = () => {
   const [formData, setFormData] = useState({
@@ -51,10 +52,8 @@ const Page = () => {
     status: "",
   });
 
-  const [tags, setTags] = useState(() => {
-    const storedTags = localStorage.getItem("tags");
-    return storedTags ? JSON.parse(storedTags) : [];
-  });
+  const [tags, setTags] = useState([]);
+  const token = getAccessToken();
 
   const [selectedTag, setSelectedTag] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
@@ -62,9 +61,30 @@ const Page = () => {
   const [editTag, setEditTag] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem("tags", JSON.stringify(tags));
-  }, [tags]);
+    const fetchTags = async () => {
+      try {
+        const response = await fetch("https://api.waterhub.africa/api/v1/client/tag/list", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+              "Accept": "application/json",
+          },
+        });
+        const data = await response.json();
+        if (data.status === "Success") {
+         
+          const tagsData = data.data.flatMap((device) => device.tags);
+          setTags(tagsData);
+          console.log("Fetched Tags:", tagsData); 
+        }
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+      }
+    };
 
+    fetchTags();
+  }, [token]);
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({
@@ -86,7 +106,7 @@ const Page = () => {
 
     setTags((prevTags) => [...prevTags, newTag]);
 
-    // Reset the form data to its initial state
+    
     setFormData({
       serial: "",
       client: "",
@@ -267,46 +287,38 @@ const Page = () => {
               <TableCaption>Tag List</TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => sortData("serial")}
-                  >
-                    Serial No{" "}
-                    <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
-                  </TableHead>
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => sortData("client")}
-                  >
-                    Client{" "}
-                    <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
-                  </TableHead>
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => sortData("site")}
-                  >
-                    Site{" "}
-                    <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
-                  </TableHead>
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => sortData("status")}
-                  >
-                    Status{" "}
-                    <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
-                  </TableHead>
-                  <TableHead>Date Created</TableHead>
-                  <TableHead>Actions</TableHead>
+                <TableHead
+                className="cursor-pointer"
+                onClick={() => sortData("tag_id")}
+              >
+                Tag ID
+                <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
+              </TableHead>
+              <TableHead
+                className="cursor-pointer"
+                onClick={() => sortData("customer.customer_name")}
+              >
+                Customer Name
+                <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
+              </TableHead>
+              <TableHead
+                className="cursor-pointer"
+                onClick={() => sortData("token_balance")}
+              >
+                Token Balance
+                <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
+              </TableHead>
+              <TableHead>Device Serial</TableHead>
+              <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {tags.map((tag, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{tag.serial}</TableCell>
-                    <TableCell>{tag.client}</TableCell>
-                    <TableCell>{tag.site}</TableCell>
-                    <TableCell>{tag.status}</TableCell>
-                    <TableCell>{tag.date}</TableCell>
+              {tags.map((tag, index) => (
+                <TableRow key={index}>
+                  <TableCell>{tag.tag_id}</TableCell>
+                  <TableCell>{tag.customer ? tag.customer.customer_name : "N/A"}</TableCell>
+                  <TableCell>{tag.token_balance}</TableCell>
+                  <TableCell>{tag.device}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -353,11 +365,10 @@ const Page = () => {
             <DialogTitle>Tag Details</DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
-            <p>Serial: {selectedTag?.serial}</p>
-            <p>Client: {selectedTag?.client}</p>
-            <p>Site: {selectedTag?.site}</p>
-            <p>Status: {selectedTag?.status}</p>
-            <p>Date: {selectedTag?.date}</p>
+            <p>Tag ID: {selectedTag?.tag_id}</p>
+            <p>Customer Name: {selectedTag?.customer.customer_name}</p>
+            <p>Token Balance: {selectedTag?.token_balance}</p>
+            <p>Device Serial Number: {selectedTag?.device}</p>
           </div>
           
         </DialogContent>

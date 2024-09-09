@@ -42,6 +42,7 @@ import Sidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Useravatar from "@/components/Useravatar";
+import { getAccessToken } from "@/components/utils/auth";
 
 const Page = () => {
   const [formData, setFormData] = useState({
@@ -54,20 +55,56 @@ const Page = () => {
     valve: "",
   });
 
-  const [devices, setDevices] = useState(() => {
-    const storedDevices = localStorage.getItem("devices");
-    return storedDevices ? JSON.parse(storedDevices) : [];
-  });
-
+  const [devices, setDevices] = useState([]);
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [formError, setFormError] = useState("");
   const [editDevice, setEditDevice] = useState(null);
+  const token = getAccessToken();
+
 
   useEffect(() => {
-    localStorage.setItem("devices", JSON.stringify(devices));
-  }, [devices]);
-
+    const fetchDevices = async () => {
+      try {
+        const response = await fetch(
+          "https://api.waterhub.africa/api/v1/client/device/list",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+              "Accept": "application/json",
+            },
+          }
+        );
+  
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched data:", data);
+  
+          
+          const devicesArray = data["0"].map(device => ({
+            serial: device.device_serial,
+            taps: device.no_of_tap,
+            client: device.user.client,
+            site: device.site.site_name,
+            valve: device.valve_type,
+          }));
+  
+          setDevices(devicesArray);
+        } else {
+          console.error("Error response:", response);
+          setFormError("Failed to fetch devices");
+        }
+      } catch (error) {
+        console.error("Error fetching devices:", error);
+        setFormError("An error occurred while fetching devices.");
+      }
+    };
+  
+    fetchDevices();
+  }, [token]);
+  
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({
@@ -107,26 +144,6 @@ const Page = () => {
 
   const handleDelete = (index) => {
     setDevices((prevDevices) => prevDevices.filter((_, i) => i !== index));
-  };
-
-  const sortData = (key) => {
-    let direction = "ascending";
-    if (sortConfig.key === key && sortConfig.direction === "ascending") {
-      direction = "descending";
-    }
-
-    const sortedDevices = [...devices].sort((a, b) => {
-      if (a[key] < b[key]) {
-        return direction === "ascending" ? -1 : 1;
-      }
-      if (a[key] > b[key]) {
-        return direction === "ascending" ? 1 : -1;
-      }
-      return 0;
-    });
-
-    setSortConfig({ key, direction });
-    setDevices(sortedDevices);
   };
 
   const openDialog = (device) => {
@@ -322,33 +339,23 @@ const Page = () => {
             <TableCaption>Device List</TableCaption>
             <TableHeader>
               <TableRow>
-                <TableHead className="cursor-pointer" onClick={() => sortData("serial")}>
-                  Serial No <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
-                </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => sortData("taps")}>
-                  Taps <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
-                </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => sortData("client")}>
-                  Client <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
-                </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => sortData("site")}>
-                  Site <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
-                </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => sortData("status")}>
-                  Status <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
-                </TableHead>
+                <TableHead >Serial No </TableHead>
+              <TableHead >Taps </TableHead>
+              <TableHead >Client Name</TableHead>
+              <TableHead >Site Name</TableHead>
+              <TableHead >Valve Type </TableHead>
                 <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {devices.map((device, index) => (
-                <TableRow key={index}>
-                  <TableCell>{device.serial}</TableCell>
-                  <TableCell>{device.taps}</TableCell>
-                  <TableCell>{device.client}</TableCell>
-                  <TableCell>{device.site}</TableCell>
-                  <TableCell>{device.status}</TableCell>
+            {devices.map((device, index) => (
+            <TableRow key={index}>
+              <TableCell>{device.serial}</TableCell>
+              <TableCell>{device.taps}</TableCell>
+              <TableCell>{device.client}</TableCell>
+              <TableCell>{device.site}</TableCell>
+              <TableCell>{device.valve}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger>
@@ -391,12 +398,10 @@ const Page = () => {
             </DialogHeader>
             {selectedDevice && (
               <div className="p-2">
-                <p><strong>Serial:</strong> {selectedDevice.serial}</p>
-                <p><strong>Taps:</strong> {selectedDevice.taps}</p>
-                <p><strong>Client:</strong> {selectedDevice.client}</p>
-                <p><strong>Site:</strong> {selectedDevice.site}</p>
-                <p><strong>Status:</strong> {selectedDevice.status}</p>
-                <p><strong>Version:</strong> {selectedDevice.version}</p>
+                <p><strong>Serial Number:</strong> {selectedDevice.serial}</p>
+                <p><strong>No of Taps:</strong> {selectedDevice.taps}</p>
+                <p><strong>Client Name:</strong> {selectedDevice.client}</p>
+                <p><strong>Site Name:</strong> {selectedDevice.site}</p>
                 <p><strong>Valve:</strong> {selectedDevice.valve}</p>
               </div>
             )}

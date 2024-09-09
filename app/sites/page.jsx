@@ -48,6 +48,7 @@ import { Input } from "@/components/ui/input";
 import Useravatar from "@/components/Useravatar";
 import Timezone from "@/components/Timezone";
 import Country from "@/components/Country";
+import { getAccessToken } from "@/components/utils/auth";
 
 const Page = () => {
   const [formData, setFormData] = useState({
@@ -59,20 +60,48 @@ const Page = () => {
     status: "",
   });
 
-  const [sites, setSites] = useState(() => {
-    const storedSites = localStorage.getItem("sites");
-    return storedSites ? JSON.parse(storedSites) : [];
-  });
+  const [sites, setSites] = useState([]);
 
   const [selectedSite, setSelectedSite] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [formError, setFormError] = useState("");
   const [editSite, setEditSite] = useState(null);
+  const token = getAccessToken();
 
   useEffect(() => {
-    localStorage.setItem("sites", JSON.stringify(sites));
-  }, [sites]);
-
+    const fetchSites = async () => {
+      try {
+        const response = await fetch(
+          "https://api.waterhub.africa/api/v1/client/sites",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+  
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched data :", data);
+  
+         
+          setSites(data[0] || []); 
+        } else {
+          console.error("Error response:", response);
+          setFormError("Failed to fetch sites");
+        }
+      } catch (error) {
+        console.error("Error fetching sites:", error);
+        setFormError("An error occurred while fetching sites.");
+      }
+    };
+  
+    fetchSites();
+  }, [token]);
+  
+  
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({
@@ -300,32 +329,30 @@ const Page = () => {
             <TableCaption>A list of all the sites.</TableCaption>
             <TableHeader>
               <TableRow>
-                <TableHead onClick={() => sortData("name")}>
+                <TableHead onClick={() => sortData("site_name")}>
                   <div className="flex items-center">
                     Site Name
                     <ArrowDownUp
                       size={16}
-                      className={`ml-2 ${sortConfig.key === "name" && sortConfig.direction === "ascending" ? "rotate-180" : ""}`}
+                      className={`ml-2 ${sortConfig.key === "site_name" && sortConfig.direction === "ascending" ? "rotate-180" : ""}`}
                     />
                   </div>
                 </TableHead>
                 <TableHead>Site Country</TableHead>
                 <TableHead>Site Location</TableHead>
-                <TableHead>Site Status</TableHead>
-                <TableHead>Site Timezone</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>Latitude</TableHead>
+                <TableHead>Longitude</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody >
               {sites.map((site, index) => (
                 <TableRow key={index}>
-                  <TableCell>{site.name}</TableCell>
-                  <TableCell>{site.country}</TableCell>
-                  <TableCell>{site.location}</TableCell>
-                  <TableCell>{site.status}</TableCell>
-                  <TableCell>{site.timezone.toUpperCase()}</TableCell>
-                  <TableCell>{site.date}</TableCell>
+                   <TableCell>{site.site_name || "No Name"}</TableCell>
+                  <TableCell>{site.country || "No Country"}</TableCell>
+                  <TableCell>{site.site_location || "No Location"}</TableCell>
+                  <TableCell>{site.latitude || "No Latitude"}</TableCell>
+                  <TableCell>{site.longitude || "No Longitude"}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger>
@@ -359,19 +386,18 @@ const Page = () => {
 
       {/* View Site Dialog */}
       <Dialog open={!!selectedSite} onOpenChange={closeDialog}>
-        <DialogContent className="max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>{selectedSite?.name}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            <div>Country: {selectedSite?.country}</div>
-            <div>Location: {selectedSite?.location}</div>
-            <div>Timezone: {selectedSite?.timezone.toUpperCase()}</div>
-            <div>Status: {selectedSite?.status}</div>
-            <div>Date: {selectedSite?.date}</div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <DialogContent className="max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>{selectedSite?.site_name}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-2">
+          <div>Country: {selectedSite?.country}</div>
+          <div>Location: {selectedSite?.site_location}</div>
+          <div>Latitude: {selectedSite?.latitude}</div>
+          <div>Longitude: {selectedSite?.longitude}</div>
+        </div>
+      </DialogContent>
+    </Dialog>
 
 
       {/* Edit Site Dialog */}

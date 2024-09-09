@@ -126,10 +126,11 @@ const Page = () => {
       );
 
       const data = await response.json();
-      console.log("API Response:", data);
+      
+      console.log("List of customers", data);
 
       if (response.ok) {
-        setCustomers((prevCustomers) => [...prevCustomers, newCustomer]);
+        setCustomers((prevCustomers) => [newCustomer, ...prevCustomers]);
 
         setFormData({
           name: "",
@@ -170,7 +171,7 @@ const Page = () => {
           prevCustomers.filter((_, i) => i !== index)
         );
       } else {
-        // Handle the error case
+        
         const data = await response.json();
         console.error("Error deleting customer:", data.message);
         setFormError(data.message || "Failed to delete customer");
@@ -241,6 +242,8 @@ const Page = () => {
                 customer.id === updatedCustomer.id ? updatedCustomer : customer
               )
             );
+
+            console.log("Customer updated succesfully")
             closeEditDialog();
           } else {
             const data = await response.json();
