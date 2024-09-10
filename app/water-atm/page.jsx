@@ -147,7 +147,7 @@ const Page = () => {
   };
 
   const openDialog = (device) => {
-    setSelectedDevice(device);
+    window.location.href = `/device/${device.serial}`;
   };
 
   const closeDialog = () => {
@@ -391,7 +391,7 @@ const Page = () => {
         </div>
 
         {/* View Device Details Dialog */}
-        <Dialog open={selectedDevice !== null} onOpenChange={closeDialog}>
+        {/* <Dialog open={selectedDevice !== null} onOpenChange={closeDialog}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Device Details</DialogTitle>
@@ -406,7 +406,7 @@ const Page = () => {
               </div>
             )}
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
 
         {/* Edit Device Dialog */}
         <Dialog open={editDevice !== null} onOpenChange={closeEditDialog} >

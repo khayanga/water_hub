@@ -14,9 +14,9 @@ export const navItems = [
     icon:UsersRound,
     links: [
       { href: '/customers', label: 'Customers' },
-      { href: '/clients', label: 'Clients' },
-      { href: '/partners', label: 'Partners' },
-      { href: '/admins', label: 'Admins' },
+      // { href: '/clients', label: 'Clients' },
+      // { href: '/partners', label: 'Partners' },
+      // { href: '/admins', label: 'Admins' },
     ],
   },
   {
