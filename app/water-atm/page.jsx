@@ -84,6 +84,7 @@ const Page = () => {
   
           
           const devicesArray = data["0"].map(device => ({
+            id:device.id,
             serial: device.device_serial,
             taps: device.no_of_tap,
             client: device.user.client,
@@ -147,7 +148,7 @@ const Page = () => {
   };
 
   const openDialog = (device) => {
-    window.location.href = `/device/${device.serial}`;
+    window.location.href = `/device/${device.id}`;
   };
 
   const closeDialog = () => {
