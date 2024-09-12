@@ -1,13 +1,3 @@
-// import React from 'react'
-
-// const stackedChart = () => {
-//   return (
-//     <div>stackedChart</div>
-//   )
-// }
-
-// export default stackedChart
-
 
 "use client";
 

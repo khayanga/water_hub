@@ -46,18 +46,18 @@ export const navItems = [
     icon:Folders,
     links: [
       { href: '/transaction', label: 'Transaction Reports' },
-      { href: '/consumption', label: 'Consumption Reports' },
-      { href: '/revenue', label: 'Revenue Reports' },
+      // { href: '/consumption', label: 'Consumption Reports' },
+      // { href: '/revenue', label: 'Revenue Reports' },
     ],
   },
 
-  {
-    id:"analytics",
-    name:"Analytics",
-    href: '/analytics',
-    icon:LineChart,
+  // {
+  //   id:"analytics",
+  //   name:"Analytics",
+  //   href: '/analytics',
+  //   icon:LineChart,
     
-  },
+  // },
   
   {
     id:"settings",
@@ -65,10 +65,10 @@ export const navItems = [
     icon:Settings,
     links: [
       { href: '/account', label: 'Account' },
-      { href: '/business', label: 'Business' },
+      // { href: '/business', label: 'Business' },
       // { href: '/content', label: 'Content' },
       // { href: '/version', label: 'Version' },
-      { href: '/system', label: 'System' },
+      // { href: '/system', label: 'System' },
     ],
   },
  
