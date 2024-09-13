@@ -9,6 +9,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+import {
   Table,
   TableBody,
   TableCaption,
@@ -49,14 +58,17 @@ const Page = () => {
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [editCustomer, setEditCustomer] = useState(null);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10;
   const token = getAccessToken();
 
+ 
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
         const response = await fetch(
-          "https://api.waterhub.africa/api/v1/client/customer/list?per_page=20",
+          `https://api.waterhub.africa/api/v1/client/customer/list?per_page=${itemsPerPage}&page=${currentPage}`,
           {
             method: "GET",
             headers: {
@@ -65,11 +77,12 @@ const Page = () => {
             },
           }
         );
-  
+
         if (response.ok) {
           const data = await response.json();
           console.log("Fetched data:", data);
-          setCustomers(data.data || []); 
+          setCustomers(data.data || []);
+          setTotalPages(data.total_pages); // Assuming the API returns total pages
         } else {
           console.error("Error response:", response);
           setFormError("Failed to fetch customers");
@@ -79,9 +92,9 @@ const Page = () => {
         setFormError("An error occurred while fetching customers.");
       }
     };
-  
+
     fetchCustomers();
-  }, [token]);
+  }, [token, currentPage]);
   
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -262,6 +275,10 @@ const Page = () => {
       const closeEditDialog = () => {
         setEditCustomer(null);
       };
+
+      const handlePageChange = (page) => {
+        setCurrentPage(page);
+      };
     
   
   return (
@@ -368,6 +385,7 @@ const Page = () => {
             <TableCaption>A list of all the customers.</TableCaption>
             <TableHeader>
               <TableRow>
+              <TableHead>#</TableHead>
                 <TableHead onClick={() => sortData("name")}>
                   <div className="flex items-center">
                     Customer Name
@@ -382,8 +400,6 @@ const Page = () => {
                     />
                   </div>
                 </TableHead>
-               
-                <TableHead>Customer Email</TableHead>
                 <TableHead>Contact</TableHead>
                 <TableHead>Date Added</TableHead>
                 <TableHead>Actions</TableHead>
@@ -392,10 +408,10 @@ const Page = () => {
             <TableBody>
               {customers.map((customer, index) => (
                 <TableRow key={index}>
+                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{customer.name}</TableCell>
-                  <TableCell>{customer.email}</TableCell>
                   <TableCell>{customer.phone}</TableCell>
-                  <TableCell>{new Date().toLocaleDateString()}</TableCell>
+                  <TableCell>{customer.created_at}</TableCell>
                   <TableCell>
                   <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -428,6 +444,29 @@ const Page = () => {
               ))}
             </TableBody>
           </Table>
+
+          <div className="my-2 pr-4 ">
+            <Pagination className="flex items-center justify-end ">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  />
+                </PaginationItem>
+                
+
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
         </Card>
          {/* Viewing details modal */}
         {selectedCustomer && (
@@ -440,9 +479,8 @@ const Page = () => {
                 </DialogDescription>
               </DialogHeader>
               <div>
-                <p><strong>Email:</strong> {selectedCustomer.email}</p>
                 <p><strong>Phone:</strong> {selectedCustomer.phone}</p>
-                <p><strong>Date Added:</strong> {new Date().toLocaleDateString()}</p>
+                <p><strong>Date Added:</strong> {selectedCustomer.created_at}</p>
                </div>
             </DialogContent>
           </Dialog>
