@@ -8,6 +8,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+import {
   Table,
   TableBody,
   TableCaption,
@@ -59,11 +68,14 @@ const Page = () => {
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [formError, setFormError] = useState("");
   const [editTag, setEditTag] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await fetch("https://api.waterhub.africa/api/v1/client/tag/list", {
+        const response = await fetch(`https://api.waterhub.africa/api/v1/client/tag/list?per_page=${itemsPerPage}&page=${currentPage}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -76,6 +88,7 @@ const Page = () => {
          
           const tagsData = data.data.flatMap((device) => device.tags);
           setTags(tagsData);
+          setTotalPages(data.total_pages); 
           console.log("Fetched Tags:", tagsData); 
         }
       } catch (error) {
@@ -84,7 +97,7 @@ const Page = () => {
     };
 
     fetchTags();
-  }, [token]);
+  }, [token,currentPage]);
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({
@@ -171,6 +184,15 @@ const Page = () => {
       )
     );
     closeEditDialog();
+  };
+  // const handlePageChange = (page) => {
+  //   setCurrentPage(page);
+  // };
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   return (
@@ -287,6 +309,7 @@ const Page = () => {
               <TableCaption>Tag List</TableCaption>
               <TableHeader>
                 <TableRow>
+                  <TableHead>#</TableHead>
                 <TableHead
                 className="cursor-pointer"
                 onClick={() => sortData("tag_id")}
@@ -315,6 +338,7 @@ const Page = () => {
               <TableBody>
               {tags.map((tag, index) => (
                 <TableRow key={index}>
+                  <TableCell>{index + 1 }</TableCell>
                   <TableCell>{tag.tag_id}</TableCell>
                   <TableCell>{tag.customer ? tag.customer.customer_name : "N/A"}</TableCell>
                   <TableCell>{tag.token_balance}</TableCell>
@@ -354,6 +378,28 @@ const Page = () => {
                 ))}
               </TableBody>
             </Table>
+            <div className="my-2 pr-4 ">
+            <Pagination className="flex items-center justify-end ">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  />
+                </PaginationItem>
+                
+
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
           </Card>
         </div>
       </div>

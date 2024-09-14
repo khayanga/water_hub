@@ -40,7 +40,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import Sidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,7 +69,9 @@ const Page = () => {
   });
 
   const [sites, setSites] = useState([]);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 5;
   const [selectedSite, setSelectedSite] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [formError, setFormError] = useState("");
@@ -205,7 +215,13 @@ const Page = () => {
     );
     closeEditDialog();
   };
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
+
+
+  
   return (
     <div className="w-11/12 mx-auto">
       <Sidebar />
@@ -329,6 +345,7 @@ const Page = () => {
             <TableCaption>A list of all the sites.</TableCaption>
             <TableHeader>
               <TableRow>
+              <TableHead>#</TableHead>
                 <TableHead onClick={() => sortData("site_name")}>
                   <div className="flex items-center">
                     Site Name
@@ -348,6 +365,7 @@ const Page = () => {
             <TableBody >
               {sites.map((site, index) => (
                 <TableRow key={index}>
+                  <TableCell>{index + 1 }</TableCell>
                    <TableCell>{site.site_name || "No Name"}</TableCell>
                   <TableCell>{site.country || "No Country"}</TableCell>
                   <TableCell>{site.site_location || "No Location"}</TableCell>
@@ -381,6 +399,29 @@ const Page = () => {
               ))}
             </TableBody>
           </Table>
+
+          <div className="my-2 pr-4 ">
+            <Pagination className="flex items-center justify-end ">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  />
+                </PaginationItem>
+                
+
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
         </Card>
       </div>
 

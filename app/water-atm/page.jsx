@@ -8,6 +8,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+import {
   Table,
   TableBody,
   TableCaption,
@@ -56,6 +65,9 @@ const Page = () => {
   });
 
   const [devices, setDevices] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 5;
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [formError, setFormError] = useState("");
@@ -67,7 +79,7 @@ const Page = () => {
     const fetchDevices = async () => {
       try {
         const response = await fetch(
-          "https://api.waterhub.africa/api/v1/client/device/list",
+          `https://api.waterhub.africa/api/v1/client/device/list?per_page=${itemsPerPage}&page=${currentPage}`,
           {
             method: "GET",
             headers: {
@@ -81,6 +93,7 @@ const Page = () => {
         if (response.ok) {
           const data = await response.json();
           console.log("Fetched data:", data);
+          setTotalPages(data.total_pages);
   
           
           const devicesArray = data["0"].map(device => ({
@@ -104,7 +117,7 @@ const Page = () => {
     };
   
     fetchDevices();
-  }, [token]);
+  }, [token, currentPage]);
   
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -178,6 +191,10 @@ const Page = () => {
       )
     );
     closeEditDialog();
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -340,6 +357,7 @@ const Page = () => {
             <TableCaption>Device List</TableCaption>
             <TableHeader>
               <TableRow>
+                <TableHead>#</TableHead>
                 <TableHead >Serial No </TableHead>
               <TableHead >Taps </TableHead>
               <TableHead >Client Name</TableHead>
@@ -352,6 +370,7 @@ const Page = () => {
             <TableBody>
             {devices.map((device, index) => (
             <TableRow key={index}>
+              <TableCell>{index}</TableCell>
               <TableCell>{device.serial}</TableCell>
               <TableCell>{device.taps}</TableCell>
               <TableCell>{device.client}</TableCell>
@@ -387,27 +406,34 @@ const Page = () => {
             </TableBody>
           </Table>
 
+          <div className="my-2 pr-4 ">
+            <Pagination className="flex items-center justify-end ">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  />
+                </PaginationItem>
+                
+
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+
             </Card>
           
         </div>
 
-        {/* View Device Details Dialog */}
-        {/* <Dialog open={selectedDevice !== null} onOpenChange={closeDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Device Details</DialogTitle>
-            </DialogHeader>
-            {selectedDevice && (
-              <div className="p-2">
-                <p><strong>Serial Number:</strong> {selectedDevice.serial}</p>
-                <p><strong>No of Taps:</strong> {selectedDevice.taps}</p>
-                <p><strong>Client Name:</strong> {selectedDevice.client}</p>
-                <p><strong>Site Name:</strong> {selectedDevice.site}</p>
-                <p><strong>Valve:</strong> {selectedDevice.valve}</p>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog> */}
+        
 
         {/* Edit Device Dialog */}
         <Dialog open={editDevice !== null} onOpenChange={closeEditDialog} >

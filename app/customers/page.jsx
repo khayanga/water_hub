@@ -60,7 +60,7 @@ const Page = () => {
   const [editCustomer, setEditCustomer] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
   const token = getAccessToken();
 
  
@@ -82,7 +82,7 @@ const Page = () => {
           const data = await response.json();
           console.log("Fetched data:", data);
           setCustomers(data.data || []);
-          setTotalPages(data.total_pages); // Assuming the API returns total pages
+          setTotalPages(data.total_pages); 
         } else {
           console.error("Error response:", response);
           setFormError("Failed to fetch customers");
@@ -408,7 +408,7 @@ const Page = () => {
             <TableBody>
               {customers.map((customer, index) => (
                 <TableRow key={index}>
-                   <TableCell>{index + 1}</TableCell>
+                   <TableCell>{index + 1 + (currentPage - 1) * itemsPerPage}</TableCell>
                   <TableCell>{customer.name}</TableCell>
                   <TableCell>{customer.phone}</TableCell>
                   <TableCell>{customer.created_at}</TableCell>
