@@ -11,6 +11,7 @@ import Sidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Useravatar from "@/components/Useravatar";
+import { getAccessToken } from "@/components/utils/auth";
 
 const Page = () => {
   const [formData, setFormData] = useState({
@@ -27,6 +28,7 @@ const Page = () => {
     approverContact: "",
     image: null,
   });
+  const token = getAccessToken();
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -36,9 +38,49 @@ const Page = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
+    
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    
+    const url = "https://api.waterhub.africa/api/v1/client/profile/password";
+
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    };
+
+    const body = JSON.stringify({
+      old_password: formData.password,
+      password: formData.confirmPassword,
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers,
+        body,
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert("Password updated successfully!");
+        console.log("Password Update Response:", result);
+      } else {
+        alert(result.message || "Failed to update password");
+        console.error("Error:", result);
+      }
+    } catch (error) {
+      console.error("Request error:", error);
+      alert("An error occurred while updating the password.");
+    }
   };
 
   return (

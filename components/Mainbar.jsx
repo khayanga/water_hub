@@ -33,11 +33,11 @@ const Mainbar = () => {
   
 
   return (
-    <div className='text-white w-11/12 mx-auto px-8 py-2'>
+    <div className=' w-11/12 mx-auto px-8 py-2'>
       <div className='p-2'>
         <Useravatar/>
         
-        <p className='mt-2 tracking-wider text-sm font-light'>
+        <p className='mt-2 tracking-wider text-sm font-light text-black dark:text-white'>
           The following are insights of progress
         </p>
       </div>

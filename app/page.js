@@ -2,6 +2,7 @@
 import { AuthProvider } from "@/components/AuthProvider";
 import { useEffect } from 'react';
 import { useRouter } from "next/navigation";
+import { Suspense } from 'react';
 
 export default function Home({ Component, pageProps }) {
 

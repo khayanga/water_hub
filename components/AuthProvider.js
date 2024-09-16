@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Spinner from "./Spinner";
 
 const AuthContext = createContext();
 
@@ -11,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Ensure that the component is mounted before accessing sessionStorage or router
+    
     setMounted(true);
   }, []);
 
@@ -21,7 +22,7 @@ export const AuthProvider = ({ children }) => {
       if (userData) {
         setUser(JSON.parse(userData));
       } else {
-        // Add a try-catch block to handle potential routing errors
+        
         try {
           router.push("/sign-in");
         } catch (error) {
@@ -44,7 +45,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   if (!mounted) {
-    return <div className="">Loading...</div>; // Placeholder content while waiting for the component to mount
+    return  <Spinner/>
   }
 
   return (
