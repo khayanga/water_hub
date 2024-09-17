@@ -240,10 +240,10 @@ const Page = () => {
         </div>
 
         <p className="mt-2 tracking-wider text-sm font-light pl-2 ">
-          Fill in the form below to register a site.
+          The table below has a list of all the sites.
         </p>
 
-        <form className="w-full mt-5 pl-2" onSubmit={handleSubmit}>
+        <form className="w-full mt-5 pl-2 hidden " onSubmit={handleSubmit}>
           <Card>
             <CardContent className="space-y-2">
               {formError && (

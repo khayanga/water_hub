@@ -12,7 +12,8 @@ import {
 } from "@/components/ui/table";
 
 import { cards, users } from '@/data';
-
+import { MoonIcon, SunIcon } from "@radix-ui/react-icons"
+import { useTheme } from "next-themes"
 
 import React from 'react';
 import CountUp from 'react-countup';
@@ -34,7 +35,8 @@ const Mainbar = () => {
 
   return (
     <div className=' w-11/12 mx-auto px-8 py-2'>
-      <div className='p-2'>
+      <div className=' '>
+
         <Useravatar/>
         
         <p className='mt-2 tracking-wider text-sm font-light text-black dark:text-white'>

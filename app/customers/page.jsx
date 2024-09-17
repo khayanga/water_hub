@@ -46,11 +46,11 @@ import { getAccessToken } from "@/components/utils/auth";
 const Page = () => {
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
+    
     phone: "",
     password: "",
     confirmPassword: "",
-    image: null,
+    
   });
 
   const [customers, setCustomers] = useState([]);
@@ -121,7 +121,6 @@ const Page = () => {
 
     const newCustomer = {
       name: formData.name,
-      email: formData.email,
       phone: formData.phone,
     };
 
@@ -147,11 +146,10 @@ const Page = () => {
 
         setFormData({
           name: "",
-          email: "",
           phone: "",
           password: "",
           confirmPassword: "",
-          image: null,
+          
         });
         setFormError("");
       } else {
@@ -227,6 +225,8 @@ const Page = () => {
         }));
       };
     
+      
+     
       const handleEditSubmit = async (e) => {
         e.preventDefault();
         if (!editCustomer) return;
@@ -242,7 +242,6 @@ const Page = () => {
               },
               body: JSON.stringify({
                 name: editCustomer.name,
-                email: editCustomer.email,
                 phone: editCustomer.phone,
               }),
             }
@@ -250,23 +249,26 @@ const Page = () => {
       
           if (response.ok) {
             const updatedCustomer = await response.json();
+            
+            // Update the customers list with the newly updated customer
             setCustomers((prevCustomers) =>
               prevCustomers.map((customer) =>
-                customer.id === updatedCustomer.id ? updatedCustomer : customer
+                customer.id === editCustomer.id ? { ...customer, ...editCustomer } : customer
               )
             );
-
-            console.log("Customer updated succesfully")
-            closeEditDialog();
+            
+            console.log("Customer updated successfully");
+            closeEditDialog(); // Close the dialog after saving
           } else {
             const data = await response.json();
             setFormError(data.message || "Failed to update customer");
           }
         } catch (error) {
+          console.error("Error:", error);
           setFormError("An error occurred while updating the customer.");
         }
       };
-      
+       
     
       const openEditDialog = (customer) => {
         setEditCustomer(customer);
@@ -317,16 +319,7 @@ const Page = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="space-y-1">
-                  <Label htmlFor="email">Customer Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="email@gmail.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
-                </div>
+                
                 <div className="space-y-1">
                   <Label htmlFor="phone">Customer Phone</Label>
                   <Input
@@ -357,15 +350,7 @@ const Page = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="space-y-1">
-                  <Label htmlFor="image">Upload Image (optional)</Label>
-                  <Input
-                    id="image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-                </div>
+                
               </div>
             </CardContent>
             <CardFooter>
@@ -504,15 +489,7 @@ const Page = () => {
                     onChange={handleEditChange}
                   />
                 </div>
-                <div className="space-y-1">
-                  <Label htmlFor="editEmail">Email</Label>
-                  <Input
-                    type="email"
-                    id="email"
-                    value={editCustomer?.email || ""}
-                    onChange={handleEditChange}
-                  />
-                </div>
+                
                 <div className="space-y-1">
                   <Label htmlFor="editPhone">Phone</Label>
                   <Input

@@ -215,10 +215,10 @@ const Page = () => {
         </div>
 
         <p className="mt-2 tracking-wider text-sm font-light pl-2 ">
-          Fill in the form below to register a device.
+          The table below hasa list of all the devices.
         </p>
 
-        <form className="w-full mt-5 pl-2" onSubmit={handleSubmit}>
+        <form className="w-full mt-5 pl-2 hidden" onSubmit={handleSubmit}>
           <Card>
             <CardContent className="space-y-2">
               {formError && (

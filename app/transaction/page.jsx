@@ -156,7 +156,7 @@ const page = () => {
                         <TableCell>{transaction.transaction_code}</TableCell>
                         <TableCell>{transaction.amount}</TableCell>
                         <TableCell>{transaction.tap_no}</TableCell>
-                        <TableCell><Badge variant="outline">{transaction.status}</Badge></TableCell>
+                        <TableCell><Badge variant="outline" className={transaction.status === "Fail" ? "text-red-500" : "text-blue-500"}>{transaction.status}</Badge></TableCell>
                         <TableCell>{transaction.created_at}</TableCell>
                       </TableRow>
                     ))}
@@ -212,7 +212,7 @@ const page = () => {
                         <TableCell>{transaction.tag.tag_id}</TableCell>
                         <TableCell>{transaction.transaction_code}</TableCell>
                         <TableCell>{transaction.amount}</TableCell>
-                        <TableCell><Badge variant="outline">{transaction.status}</Badge></TableCell>
+                        <TableCell><Badge variant="outline" className={transaction.status === "Fail" ? "text-red-500" : "text-blue-500"}>{transaction.status}</Badge></TableCell>
                         <TableCell>{transaction.created_at}</TableCell>
                       </TableRow>
                     ))}

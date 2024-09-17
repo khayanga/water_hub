@@ -185,9 +185,7 @@ const Page = () => {
     );
     closeEditDialog();
   };
-  // const handlePageChange = (page) => {
-  //   setCurrentPage(page);
-  // };
+  
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
@@ -213,10 +211,10 @@ const Page = () => {
         </div>
 
         <p className="mt-2 tracking-wider text-sm font-light pl-2 ">
-          Fill in the form below to register a tag.
+          The table below shows a list of all registered tags.
         </p>
 
-        <form className="w-full mt-5 pl-2" onSubmit={handleSubmit}>
+        <form className="w-full mt-5 pl-2 hidden" onSubmit={handleSubmit}>
           <Card>
             <CardContent className="space-y-2">
               {formError && (
