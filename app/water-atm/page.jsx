@@ -46,7 +46,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import {
+  CaretSortIcon,
+  ChevronDownIcon,
+  DotsHorizontalIcon,
+} from "@radix-ui/react-icons"
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
 import Sidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,10 +78,9 @@ const Page = () => {
 
   const [devices, setDevices] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 5;
+  
   const [selectedDevice, setSelectedDevice] = useState(null);
-  const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
+ 
   const [formError, setFormError] = useState("");
   const [editDevice, setEditDevice] = useState(null);
   const token = getAccessToken();
@@ -79,7 +90,7 @@ const Page = () => {
     const fetchDevices = async () => {
       try {
         const response = await fetch(
-          `https://api.waterhub.africa/api/v1/client/device/list?per_page=${itemsPerPage}&page=${currentPage}`,
+          "https://api.waterhub.africa/api/v1/client/device/list",
           {
             method: "GET",
             headers: {
@@ -118,6 +129,88 @@ const Page = () => {
   
     fetchDevices();
   }, [token, currentPage]);
+
+
+  const columns = [
+    {
+      id: "index",
+      header: "#",
+      cell: (info) => info.row.index + 1,
+    },
+    {
+      accessorKey: "serial",
+      header: "Device Serial",
+      cell: ({ row }) => <div>{row.original.serial}</div>,
+    },
+    {
+      accessorKey: "taps",
+      header: "Taps",
+      cell: ({ row }) => <div>{row.original.taps}</div>,
+    },
+    {
+      accessorKey: "client",
+      header: "Client name",
+      cell: ({ row }) => {
+       
+        return <div>{row.original.client}</div>;
+      },
+    },
+    {
+      accessorKey: "site",
+      header: "Site Name",
+      cell: ({ row }) => {
+       
+        return <div>{row.original.site}</div>;
+      },
+    },
+    {
+      accessorKey: "valve",
+      header: "Valve Type",
+      cell: ({ row }) => {
+       
+        return <div>{row.original.valve}</div>;
+      },
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const customer = row.original;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <DotsHorizontalIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              
+              <DropdownMenuItem onClick={() => openDialog(row.original)}>
+                View
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => openEditDialog(row.original)}>
+                Edit
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={() => handleDelete(row.original.id, row.index)}>
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
+
+  const table = useReactTable({
+    data: devices,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+  
   
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -352,84 +445,68 @@ const Page = () => {
         </div>
 
         <div className="w-full mt-2">
-            <Card className="ml-4">
-            <Table>
-            <TableCaption>Device List</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>#</TableHead>
-                <TableHead >Serial No </TableHead>
-              <TableHead >Taps </TableHead>
-              <TableHead >Client Name</TableHead>
-              <TableHead >Site Name</TableHead>
-              <TableHead >Valve Type </TableHead>
-                <TableHead>Action</TableHead>
+        <Card className="ml-4">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
               </TableRow>
-            </TableHeader>
-
-            <TableBody>
-            {devices.map((device, index) => (
-            <TableRow key={index}>
-              <TableCell>{index}</TableCell>
-              <TableCell>{device.serial}</TableCell>
-              <TableCell>{device.taps}</TableCell>
-              <TableCell>{device.client}</TableCell>
-              <TableCell>{device.site}</TableCell>
-              <TableCell>{device.valve}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Ellipsis className="h-4 w-4" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          onClick={() => openDialog(device)}
-                        >
-                          View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => openEditDialog(device)}
-                        >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDelete(index)}
-                          
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          <div className="my-2 pr-4 ">
-            <Pagination className="flex items-center justify-end ">
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  />
-                </PaginationItem>
-                
-
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="text-center">
+                  No sites found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+         {/* Pagination Controls */}
+         <div className="flex items-center justify-end space-x-2 py-4 mx-4">
+        {/* <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div> */}
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
           </div>
-
-            </Card>
+    
+        </Card>
           
         </div>
 

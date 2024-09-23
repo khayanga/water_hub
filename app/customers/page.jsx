@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { ArrowDownUp, Ellipsis } from "lucide-react";
 import {
   DropdownMenu,
@@ -8,15 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
+
 import {
   Table,
   TableBody,
@@ -28,6 +20,19 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import {
+  CaretSortIcon,
+  ChevronDownIcon,
+  DotsHorizontalIcon,
+} from "@radix-ui/react-icons"
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
 import {
   Dialog,
   DialogContent,
@@ -46,21 +51,19 @@ import { getAccessToken } from "@/components/utils/auth";
 const Page = () => {
   const [formData, setFormData] = useState({
     name: "",
-    
     phone: "",
     password: "",
     confirmPassword: "",
     
   });
-
+  
+  
   const [customers, setCustomers] = useState([]);
   const [formError, setFormError] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [editCustomer, setEditCustomer] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 5;
+
   const token = getAccessToken();
 
  
@@ -68,7 +71,7 @@ const Page = () => {
     const fetchCustomers = async () => {
       try {
         const response = await fetch(
-          `https://api.waterhub.africa/api/v1/client/customer/list?per_page=${itemsPerPage}&page=${currentPage}`,
+          "https://api.waterhub.africa/api/v1/client/customer/list",
           {
             method: "GET",
             headers: {
@@ -82,7 +85,6 @@ const Page = () => {
           const data = await response.json();
           console.log("Fetched data:", data);
           setCustomers(data.data || []);
-          setTotalPages(data.total_pages); 
         } else {
           console.error("Error response:", response);
           setFormError("Failed to fetch customers");
@@ -94,8 +96,73 @@ const Page = () => {
     };
 
     fetchCustomers();
-  }, [token, currentPage]);
-  
+  }, [token]);
+
+
+  const columns = [
+    {
+      id: "index",
+      header: "#",
+      cell: (info) => info.row.index + 1,
+    },
+    {
+      accessorKey: "name",
+      header: "Customer Name",
+      cell: ({ row }) => <div>{row.original.name}</div>,
+    },
+    {
+      accessorKey: "phone",
+      header: "Phone Number",
+      cell: ({ row }) => <div>{row.original.phone}</div>,
+    },
+    {
+      accessorKey: "created_at",
+      header: "Date Created",
+      cell: ({ row }) => {
+       
+        return <div>{row.original.created_at}</div>;
+      },
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const customer = row.original;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <DotsHorizontalIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              
+              <DropdownMenuItem onClick={() => openDialog(row.original)}>
+                View
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => openEditDialog(row.original)}>
+                Edit
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={() => handleDelete(row.original.id, row.index)}>
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
+
+  const table = useReactTable({
+    data: customers,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({
@@ -104,12 +171,7 @@ const Page = () => {
     }));
   };
 
-  const handleImageChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      image: e.target.files[0],
-    }));
-  };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -142,7 +204,11 @@ const Page = () => {
       console.log("List of customers", data);
 
       if (response.ok) {
-        setCustomers((prevCustomers) => [newCustomer, ...prevCustomers]);
+       
+
+        const addedCustomer = data.data; 
+      
+        setCustomers((prevCustomers) => [addedCustomer, ...prevCustomers]);
 
         setFormData({
           name: "",
@@ -194,21 +260,7 @@ const Page = () => {
   };
   
 
-  const sortData = (key) => {
-    let direction = "ascending";
-    if (sortConfig.key === key && sortConfig.direction === "ascending") {
-      direction = "descending";
-    }
-
-    const sortedCustomers = [...customers].sort((a, b) => {
-      if (a[key] < b[key]) return direction === "ascending" ? -1 : 1;
-      if (a[key] > b[key]) return direction === "ascending" ? 1 : -1;
-      return 0;
-    });
-
-    setSortConfig({ key, direction });
-    setCustomers(sortedCustomers);
-  };
+  
   const openDialog = (customer) => {
         setSelectedCustomer(customer);
       };
@@ -277,11 +329,7 @@ const Page = () => {
       const closeEditDialog = () => {
         setEditCustomer(null);
       };
-
-      const handlePageChange = (page) => {
-        setCurrentPage(page);
-      };
-    
+ 
   
   return (
     <div className="w-11/12 mx-auto">
@@ -366,93 +414,69 @@ const Page = () => {
         </div>
 
         <Card className="ml-4">
-          <Table>
-            <TableCaption>A list of all the customers.</TableCaption>
-            <TableHeader>
-              <TableRow>
-              <TableHead>#</TableHead>
-                <TableHead onClick={() => sortData("name")}>
-                  <div className="flex items-center">
-                    Customer Name
-                    <ArrowDownUp
-                      size={16}
-                      className={`ml-2 ${
-                        sortConfig.key === "name" &&
-                        sortConfig.direction === "ascending"
-                          ? "rotate-180"
-                          : ""
-                      }`}
-                    />
-                  </div>
-                </TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Date Added</TableHead>
-                <TableHead>Actions</TableHead>
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {customers.map((customer, index) => (
-                <TableRow key={index}>
-                   <TableCell>{index + 1 + (currentPage - 1) * itemsPerPage}</TableCell>
-                  <TableCell>{customer.name}</TableCell>
-                  <TableCell>{customer.phone}</TableCell>
-                  <TableCell>{customer.created_at}</TableCell>
-                  <TableCell>
-                  <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup="true"
-                          size="icon"
-                          variant="ghost"
-                        >
-                          <Ellipsis className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                          <Dialog>
-                            <DialogTrigger onClick={() => openDialog(customer)}>View</DialogTrigger>
-                          </Dialog>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Dialog>
-                            <DialogTrigger onClick={() => openEditDialog(customer)}>Edit</DialogTrigger>
-                          </Dialog>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(customer.id, index)}>Delete</DropdownMenuItem>
-                        
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          <div className="my-2 pr-4 ">
-            <Pagination className="flex items-center justify-end ">
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  />
-                </PaginationItem>
-                
-
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="text-center">
+                  No customers found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+         {/* Pagination Controls */}
+         <div className="flex items-center justify-end space-x-2 py-4 mx-4">
+        {/* <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div> */}
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
           </div>
+    
         </Card>
+
+
          {/* Viewing details modal */}
         {selectedCustomer && (
           <Dialog open={!!selectedCustomer} onOpenChange={closeDialog}>
@@ -518,3 +542,4 @@ const Page = () => {
 };
 
 export default Page;
+

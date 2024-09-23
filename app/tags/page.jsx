@@ -46,7 +46,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import {
+  CaretSortIcon,
+  ChevronDownIcon,
+  DotsHorizontalIcon,
+} from "@radix-ui/react-icons"
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
 import Sidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,19 +75,16 @@ const Page = () => {
 
   const [tags, setTags] = useState([]);
   const token = getAccessToken();
-
   const [selectedTag, setSelectedTag] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [formError, setFormError] = useState("");
   const [editTag, setEditTag] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 10;
+  
 
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await fetch(`https://api.waterhub.africa/api/v1/client/tag/list?per_page=${itemsPerPage}&page=${currentPage}`, {
+        const response = await fetch("https://api.waterhub.africa/api/v1/client/tag/list", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -97,7 +106,81 @@ const Page = () => {
     };
 
     fetchTags();
-  }, [token,currentPage]);
+  }, [token]);
+
+  const columns = [
+    {
+      id: "index",
+      header: "#",
+      cell: (info) => info.row.index + 1,
+    },
+    {
+      accessorKey: "tag_id",
+      header: "Tag ID",
+      cell: ({ row }) => <div>{row.original.tag_id}</div>,
+    },
+    {
+      accessorKey: "customer_name",
+      header: "Customer Name",
+      cell: ({ row }) => <div>{row.original.customer.customer_name}</div>,
+    },
+    {
+      accessorKey: "token_balance",
+      header: "Tken Balance",
+      cell: ({ row }) => {
+       
+        return <div>{row.original.token_balance}</div>;
+      },
+    },
+    {
+      accessorKey: "device",
+      header: "Device Serial",
+      cell: ({ row }) => {
+       
+        return <div>{row.original.device}</div>;
+      },
+    },
+    
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const customer = row.original;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <DotsHorizontalIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              
+              <DropdownMenuItem onClick={() => openDialog(row.original)}>
+                View
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => openEditDialog(row.original)}>
+                Edit
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={() => handleDelete(row.original.id, row.index)}>
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
+
+  const table = useReactTable({
+    data: tags,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({
@@ -187,11 +270,7 @@ const Page = () => {
   };
   
 
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
+  
 
   return (
     <div className="w-11/12 mx-auto">
@@ -302,103 +381,68 @@ const Page = () => {
         </div>
 
         <div className="w-full mt-2">
-          <Card className="ml-4">
-            <Table>
-              <TableCaption>Tag List</TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>#</TableHead>
-                <TableHead
-                className="cursor-pointer"
-                onClick={() => sortData("tag_id")}
-              >
-                Tag ID
-                <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
-              </TableHead>
-              <TableHead
-                className="cursor-pointer"
-                onClick={() => sortData("customer.customer_name")}
-              >
-                Customer Name
-                <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
-              </TableHead>
-              <TableHead
-                className="cursor-pointer"
-                onClick={() => sortData("token_balance")}
-              >
-                Token Balance
-                <ArrowDownUp className="inline-block ml-2 h-4 w-4" />
-              </TableHead>
-              <TableHead>Device Serial</TableHead>
-              <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-              {tags.map((tag, index) => (
-                <TableRow key={index}>
-                  <TableCell>{index + 1 }</TableCell>
-                  <TableCell>{tag.tag_id}</TableCell>
-                  <TableCell>{tag.customer ? tag.customer.customer_name : "N/A"}</TableCell>
-                  <TableCell>{tag.token_balance}</TableCell>
-                  <TableCell>{tag.device}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            className="h-8 w-8 p-0"
-                          >
-                            <Ellipsis className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-32">
-                          
-                          <DropdownMenuItem
-                            onClick={() => openDialog(tag)}
-                          >
-                            View
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => openEditDialog(tag)}
-                          >
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleDelete(index)}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                          
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
+        <Card className="ml-4">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
                 ))}
-              </TableBody>
-            </Table>
-            <div className="my-2 pr-4 ">
-            <Pagination className="flex items-center justify-end ">
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  />
-                </PaginationItem>
-                
-
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="text-center">
+                  No sites found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+         {/* Pagination Controls */}
+         <div className="flex items-center justify-end space-x-2 py-4 mx-4">
+        {/* <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div> */}
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
           </div>
-          </Card>
+    
+        </Card>
         </div>
       </div>
 

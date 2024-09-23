@@ -80,7 +80,7 @@ export const cards = [
   { id: 1, name: 'Sites', stats: '50', icon: FaGlobe, description:"2% increase " },
   { id: 2, name: 'Devices', stats: '100', icon: FaMobileAlt,description:"25% increase " },
   { id: 3, name: 'Clients', stats: '75', icon: FaUsers ,description:"2% increase "},
-  { id: 4, name: 'Tags', stats: '16', icon: FaTags ,description:"1% increase "},
+  // { id: 4, name: 'Tags', stats: '16', icon: FaTags ,description:"1% increase "},
 ];
  export const users = [
   { name: 'Liam Johnson', status: 'Paid', amount: 'Kes 250.00' },

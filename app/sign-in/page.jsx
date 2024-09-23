@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import Spinner from '@/components/Spinner'; // Assuming you created this spinner
+import Spinner from '@/components/Spinner';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');

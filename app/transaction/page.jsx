@@ -28,6 +28,19 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  CaretSortIcon,
+  ChevronDownIcon,
+  DotsHorizontalIcon,
+} from "@radix-ui/react-icons"
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
 import { format } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Sidebar from "@/components/Sidebar";
@@ -40,29 +53,29 @@ import { getAccessToken } from "@/components/utils/auth";
 const page = () => {
   const [transactions, setTransactions] = useState([]);
   const [tagTransactions, setTagTransactions] = useState([]);
-  const [date, setDate] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5); 
+  const [date, setDate] = useState(null); 
 
   const token = getAccessToken();
 
-  const fetchTransactions = async (page = 1) => {
+  useEffect(() => {
+    fetchTransactions();
+    fetchTagTransactions();
+  }, []);
+
+  const fetchTransactions = async () => {
     try {
-      const response = await fetch(`https://api.waterhub.africa/api/v1/client/transactions/mpesa?page=${page}&per_page=${itemsPerPage}`, {
+      const response = await fetch("https://api.waterhub.africa/api/v1/client/transactions/mpesa", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-          "Accept": "application/json",
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
         },
       });
 
       const data = await response.json();
       if (data && data.device_transactions) {
         setTransactions(data.device_transactions);
-        
-        setTotalPages(data.total_pages || 1); 
       } else {
         console.error("Unexpected response structure", data);
       }
@@ -71,9 +84,59 @@ const page = () => {
     }
   };
 
-  const fetchTagTransactions = async (page = 1) => {
+  const columns = [
+    {
+      id: "index",
+      header: "#",
+      cell: (info) => info.row.index + 1,
+    },
+    {
+      accessorKey: "mobile_no",
+      header: "Mpesa No",
+      cell: ({ row }) => <div>{row.original.mobile_no}</div>,
+    },
+    {
+      accessorKey: "transaction_code",
+      header: "Transaction Code",
+      cell: ({ row }) => <div>{row.original.transaction_code}</div>,
+    },
+    {
+      accessorKey: "amount",
+      header: "Amount",
+      cell: ({ row }) => <div>{row.original.amount}</div>,
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.original.status;
+        return (
+          <Badge
+            variant="outline"
+            className={status === "Fail" ? "text-red-500" : "text-blue-500"}
+          >
+            {status}
+          </Badge>
+        );
+      },
+    },
+    {
+      accessorKey: "created_at",
+      header: "Created at",
+      cell: ({ row }) => <div>{row.original.created_at}</div>,
+    },
+  ];
+
+  const table = useReactTable({
+    data: transactions,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
+  const fetchTagTransactions = async () => {
     try {
-      const response = await fetch(`https://api.waterhub.africa/api/v1/client/transactions/tag?page=${page}&per_page=${itemsPerPage}`, {
+      const response = await fetch("https://api.waterhub.africa/api/v1/client/transactions/tag", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +149,7 @@ const page = () => {
       if (data && data.tag_pay_transactions) {
         setTagTransactions(data.tag_pay_transactions);
         
-        setTotalPages(data.total_pages || 1); 
+        
       } else {
         console.error("Unexpected response structure", data);
       }
@@ -95,18 +158,58 @@ const page = () => {
     }
   };
 
-  useEffect(() => {
-    if (token) {
-      fetchTransactions(currentPage);
-      fetchTagTransactions(currentPage);
-    } else {
-      console.error("Token is missing. Please ensure you are logged in.");
-    }
-  }, [token, currentPage]);
+  const tagColumns = [
+    {
+      id: "index",
+      header: "#",
+      cell: (info) => info.row.index + 1,
+    },
+    {
+      accessorKey: "tag_id",
+      header: "Tag ID",
+      cell: ({ row }) => <div>{row.original.tag.tag_id}</div>,
+    },
+    {
+      accessorKey: "transaction_code",
+      header: "Transaction Code",
+      cell: ({ row }) => <div>{row.original.transaction_code}</div>,
+    },
+    {
+      accessorKey: "amount",
+      header: "Amount",
+      cell: ({ row }) => <div>{row.original.amount}</div>,
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.original.status;
+        return (
+          <Badge
+            variant="outline"
+            className={status === "Fail" ? "text-red-500" : "text-blue-500"}
+          >
+            {status}
+          </Badge>
+        );
+      },
+    },
+    {
+      accessorKey: "created_at",
+      header: "Created at",
+      cell: ({ row }) => <div>{row.original.created_at}</div>,
+    },
+  ];
 
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
+  const tagTable = useReactTable({
+    data: tagTransactions,
+    columns: tagColumns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
+
+ 
 
   return (
     <div className="w-11/12 mx-auto">
@@ -134,112 +237,126 @@ const page = () => {
           {/* Mpesa Transactions */}
           <TabsContent value="mpesa">
             <div className="w-full mt-2">
-              <Card className="ml-4">
-                <Table>
-                  <TableCaption>Mpesa Transactions</TableCaption>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>#</TableHead>
-                      <TableHead>Mobile No</TableHead>
-                      <TableHead>Transaction Code</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Tap No</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date Created</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {transactions.map((transaction, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{index + 1 + (currentPage - 1) * itemsPerPage}</TableCell>
-                        <TableCell>{transaction.mobile_no}</TableCell>
-                        <TableCell>{transaction.transaction_code}</TableCell>
-                        <TableCell>{transaction.amount}</TableCell>
-                        <TableCell>{transaction.tap_no}</TableCell>
-                        <TableCell><Badge variant="outline" className={transaction.status === "Fail" ? "text-red-500" : "text-blue-500"}>{transaction.status}</Badge></TableCell>
-                        <TableCell>{transaction.created_at}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                <div className="my-2 pr-4">
-                  <Pagination className="flex items-center justify-end">
-                    <PaginationContent>
-                      <PaginationPrevious
-                        disabled={currentPage === 1}
-                        onClick={() => handlePageChange(currentPage - 1)}
-                      />
-                      {[...Array(totalPages).keys()].map((page) => (
-                        <PaginationItem
-                          key={page}
-                          onClick={() => handlePageChange(page + 1)}
-                          active={currentPage === page + 1}
-                        >
-                          {page + 1}
-                        </PaginationItem>
+            <Card className="ml-4">
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
                       ))}
-                      <PaginationNext
-                        disabled={currentPage === totalPages}
-                        onClick={() => handlePageChange(currentPage + 1)}
-                      />
-                    </PaginationContent>
-                  </Pagination>
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow key={row.id}>
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={columns.length} className="text-center">
+                        No transactions found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+              {/* Pagination Controls */}
+              <div className="flex items-center justify-end space-x-2 py-4 mx-4">
+              
+              <div className="space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  Next
+                </Button>
+              </div>
                 </div>
-              </Card>
+    
+            </Card>
             </div>
           </TabsContent>
 
           {/* Tag Transactions */}
           <TabsContent value="tag">
             <div className="w-full mt-2">
-              <Card className="ml-4">
+            <Card className="ml-4">
                 <Table>
-                  <TableCaption>Tag Transactions</TableCaption>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>#</TableHead>
-                      <TableHead>Tag ID</TableHead>
-                      <TableHead>Transaction Code</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date Created</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {tagTransactions.map((transaction, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{index + 1 + (currentPage - 1) * itemsPerPage}</TableCell>
-                        <TableCell>{transaction.tag.tag_id}</TableCell>
-                        <TableCell>{transaction.transaction_code}</TableCell>
-                        <TableCell>{transaction.amount}</TableCell>
-                        <TableCell><Badge variant="outline" className={transaction.status === "Fail" ? "text-red-500" : "text-blue-500"}>{transaction.status}</Badge></TableCell>
-                        <TableCell>{transaction.created_at}</TableCell>
+                    {tagTable.getHeaderGroups().map((headerGroup) => (
+                      <TableRow key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => (
+                          <TableHead key={header.id}>
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(header.column.columnDef.header, header.getContext())}
+                          </TableHead>
+                        ))}
                       </TableRow>
                     ))}
+                  </TableHeader>
+                  <TableBody>
+                    {tagTable.getRowModel().rows.length ? (
+                      tagTable.getRowModel().rows.map((row) => (
+                        <TableRow key={row.id}>
+                          {row.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id}>
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={tagColumns.length} className="text-center">
+                          No transactions found.
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
-                <div className="my-2 pr-4">
-                  <Pagination className="flex items-center justify-end">
-                    <PaginationContent>
-                      <PaginationPrevious
-                        disabled={currentPage === 1}
-                        onClick={() => handlePageChange(currentPage - 1)}
-                      />
-                      {[...Array(totalPages).keys()].map((page) => (
-                        <PaginationItem
-                          key={page}
-                          onClick={() => handlePageChange(page + 1)}
-                          active={currentPage === page + 1}
-                        >
-                          {page + 1}
-                        </PaginationItem>
-                      ))}
-                      <PaginationNext
-                        disabled={currentPage === totalPages}
-                        onClick={() => handlePageChange(currentPage + 1)}
-                      />
-                    </PaginationContent>
-                  </Pagination>
+                {/* Pagination Controls */}
+                <div className="flex items-center justify-end space-x-2 py-4 mx-4">
+                  <div className="space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => tagTable.previousPage()}
+                      disabled={!tagTable.getCanPreviousPage()}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => tagTable.nextPage()}
+                      disabled={!tagTable.getCanNextPage()}
+                    >
+                      Next
+                    </Button>
+                  </div>
                 </div>
               </Card>
             </div>

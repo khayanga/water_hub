@@ -40,19 +40,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
+
 import Sidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
+import {
+  CaretSortIcon,
+  ChevronDownIcon,
+  DotsHorizontalIcon,
+} from "@radix-ui/react-icons"
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
 import Useravatar from "@/components/Useravatar";
 import Timezone from "@/components/Timezone";
 import Country from "@/components/Country";
@@ -70,8 +74,7 @@ const Page = () => {
 
   const [sites, setSites] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 5;
+  
   const [selectedSite, setSelectedSite] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [formError, setFormError] = useState("");
@@ -110,6 +113,86 @@ const Page = () => {
   
     fetchSites();
   }, [token]);
+
+  const columns = [
+    {
+      id: "index",
+      header: "#",
+      cell: (info) => info.row.index + 1,
+    },
+    {
+      accessorKey: "site_name",
+      header: "Site Name",
+      cell: ({ row }) => <div>{row.original.site_name}</div>,
+    },
+    {
+      accessorKey: "country",
+      header: "Country",
+      cell: ({ row }) => <div>{row.original.country}</div>,
+    },
+    {
+      accessorKey: "site_location",
+      header: "Site Location",
+      cell: ({ row }) => {
+       
+        return <div>{row.original.site_location}</div>;
+      },
+    },
+    {
+      accessorKey: "latitude",
+      header: "Latitude",
+      cell: ({ row }) => {
+       
+        return <div>{row.original.latitude}</div>;
+      },
+    },
+    {
+      accessorKey: "longitude",
+      header: "Longitude",
+      cell: ({ row }) => {
+       
+        return <div>{row.original.longitude}</div>;
+      },
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const customer = row.original;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <DotsHorizontalIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              
+              <DropdownMenuItem onClick={() => openDialog(row.original)}>
+                View
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => openEditDialog(row.original)}>
+                Edit
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={() => handleDelete(row.original.id, row.index)}>
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
+
+  const table = useReactTable({
+    data: sites,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
   
   
   const handleChange = (e) => {
@@ -215,9 +298,7 @@ const Page = () => {
     );
     closeEditDialog();
   };
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+  
 
 
 
@@ -341,88 +422,68 @@ const Page = () => {
         </div>
 
         <Card className="ml-4">
-          <Table>
-            <TableCaption>A list of all the sites.</TableCaption>
-            <TableHeader>
-              <TableRow>
-              <TableHead>#</TableHead>
-                <TableHead onClick={() => sortData("site_name")}>
-                  <div className="flex items-center">
-                    Site Name
-                    <ArrowDownUp
-                      size={16}
-                      className={`ml-2 ${sortConfig.key === "site_name" && sortConfig.direction === "ascending" ? "rotate-180" : ""}`}
-                    />
-                  </div>
-                </TableHead>
-                <TableHead>Site Country</TableHead>
-                <TableHead>Site Location</TableHead>
-                <TableHead>Latitude</TableHead>
-                <TableHead>Longitude</TableHead>
-                <TableHead>Actions</TableHead>
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
               </TableRow>
-            </TableHeader>
-            <TableBody >
-              {sites.map((site, index) => (
-                <TableRow key={index}>
-                  <TableCell>{index + 1 }</TableCell>
-                   <TableCell>{site.site_name || "No Name"}</TableCell>
-                  <TableCell>{site.country || "No Country"}</TableCell>
-                  <TableCell>{site.site_location || "No Location"}</TableCell>
-                  <TableCell>{site.latitude || "No Latitude"}</TableCell>
-                  <TableCell>{site.longitude || "No Longitude"}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Ellipsis className="cursor-pointer" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => openDialog(site)}>
-                          View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="cursor-pointer"
-                          onClick={() => openEditDialog(site)}
-                        >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="cursor-pointer"
-                          onClick={() => handleDelete(index)}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          <div className="my-2 pr-4 ">
-            <Pagination className="flex items-center justify-end ">
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  />
-                </PaginationItem>
-                
-
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="text-center">
+                  No sites found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+         {/* Pagination Controls */}
+         <div className="flex items-center justify-end space-x-2 py-4 mx-4">
+        {/* <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div> */}
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
           </div>
+    
         </Card>
+
       </div>
 
       {/* View Site Dialog */}

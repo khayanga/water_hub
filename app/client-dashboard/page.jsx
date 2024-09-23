@@ -1,6 +1,5 @@
-"use client"
-import Link from "next/link";
-import { useState, useEffect } from "react";
+'use client';
+import CountUp from 'react-countup';
 import {
   Table,
   TableBody,
@@ -10,13 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-import { cards, users } from '@/data';
-
-
-import React from 'react';
-import CountUp from 'react-countup';
-import { Stackedchart } from './Stackedchart';
 import {
   Card,
   CardContent,
@@ -25,15 +17,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Sidebar from '@/components/Sidebar';
+import Mainbar from '@/components/Mainbar';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { cards, users } from '@/data';
+import Useravatar from '@/components/Useravatar';
+import { Stackedchart } from '@/components/Stackedchart';
+import Link from 'next/link';
 import { FiArrowUpRight } from "react-icons/fi";
 
-import Useravatar from "./Useravatar";
 
-const Mainbar = () => {
+const Page = () => {
   
-
   return (
-    <div className=' w-11/12 mx-auto px-8 py-2'>
+    // <ProtectedRoute>
+      <div className=' flex min-h-screen w-full flex-col gap-3 px-2 py-4'>
+      <Sidebar />
+
+      <div className=' w-11/12 mx-auto px-8 py-2'>
       <div className=' '>
 
         <Useravatar/>
@@ -108,7 +109,12 @@ const Mainbar = () => {
         </div>
       </div>
     </div>
+     
+    </div>
+
+    // </ProtectedRoute>
+    
   );
 };
 
-export default Mainbar;
+export default Page;
