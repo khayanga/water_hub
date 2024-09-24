@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import axios from "axios";
 import {
   Card,
   CardContent,
@@ -25,10 +26,52 @@ import Useravatar from '@/components/Useravatar';
 import { Stackedchart } from '@/components/Stackedchart';
 import Link from 'next/link';
 import { FiArrowUpRight } from "react-icons/fi";
+import { getAccessToken } from '@/components/utils/auth';
+import { useEffect, useState } from 'react';
 
 
 const Page = () => {
-  
+
+  const [balance, setBalance] = useState(null); 
+  const [currency, setCurrency] = useState("KES"); 
+  const token = getAccessToken(); 
+
+  useEffect(() => {
+    const fetchWalletBalance = async () => {
+      try {
+        const response = await axios.get(
+          "https://api.waterhub.africa/api/v1/client/wallet/balance",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          }
+        );
+
+        
+        console.log("API response:", response.data);
+
+      
+        if (response.data.message === "Success") {
+          setBalance(response.data.data); 
+          setCurrency("KES"); 
+        } else {
+          setBalance(0); 
+        }
+      } catch (error) {
+        console.error("Error fetching wallet balance:", error); 
+        setBalance(0); 
+      } 
+    };
+
+    if (token) {
+      fetchWalletBalance();
+    }
+  }, [token]);
+
+
   return (
     // <ProtectedRoute>
       <div className=' flex min-h-screen w-full flex-col gap-3 px-2 py-4'>
@@ -64,6 +107,25 @@ const Page = () => {
             </CardContent>
           </Card>
         ))}
+
+        <Card className="bg-blue-50 p-4">
+          <h1 className="text-gray-800">Wallet balance</h1>
+          {balance !== null ? (
+            <div className="text-2xl font-bold text-blue-700 gap-4">
+              <CountUp end={parseInt(balance, 10)} duration={2.5} /> {currency}
+              
+            </div>
+          ) : (
+            <p>0 {currency}</p>
+          )}
+
+          <div className='flex justify-end'>
+          <Button>Withdraw</Button>
+          </div>
+        </Card>
+
+
+          
       </div>
 
       <div className='mt-12 flex flex-col md:flex-row gap-6 p-2'>

@@ -77,7 +77,7 @@ const Page = () => {
   });
 
   const [devices, setDevices] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+
   
   const [selectedDevice, setSelectedDevice] = useState(null);
  
@@ -104,7 +104,7 @@ const Page = () => {
         if (response.ok) {
           const data = await response.json();
           console.log("Fetched data:", data);
-          setTotalPages(data.total_pages);
+         
   
           
           const devicesArray = data["0"].map(device => ({
@@ -128,7 +128,7 @@ const Page = () => {
     };
   
     fetchDevices();
-  }, [token, currentPage]);
+  }, [token]);
 
 
   const columns = [
@@ -474,7 +474,7 @@ const Page = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="text-center">
-                  No sites found.
+                  No devices found.
                 </TableCell>
               </TableRow>
             )}
