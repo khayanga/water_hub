@@ -50,7 +50,7 @@ const SignIn = () => {
         login(result.data); 
         setEmail('');
         setPassword('');
-        router.push('/dashboard'); 
+        router.push('/client-dashboard'); 
       } else {
         setError(result.message || 'Failed to sign in. Please check your email and password.');
       }

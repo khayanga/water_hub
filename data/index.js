@@ -2,9 +2,9 @@ import { UsersRound ,Settings,LineChart,File,MapPin,Tags, Home,Waves,Folders} fr
 import { FaGlobe, FaMobileAlt, FaUsers, FaTags } from 'react-icons/fa';
 
 export const navItems = [
- {  id: 'dashboard',
+ {  id: 'client-dashboard',
     name: 'Dashboard',
-    href: '/dashboard',
+    href: '/client-dashboard',
     icon: Home,
  },
   
