@@ -126,7 +126,7 @@ const Page = () => {
     },
     {
       accessorKey: "token_balance",
-      header: "Tken Balance",
+      header: "Token Balance",
       cell: ({ row }) => {
        
         return <div>{row.original.token_balance}</div>;

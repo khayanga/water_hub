@@ -544,7 +544,7 @@ const Page = () => {
               <Label htmlFor="timezone">Timezone</Label>
               <Timezone
                     id="timezone"
-                    value={editSite?.timezone.toUpperCase() || ""}
+                    value={editSite?.timezone || ""}
                     onChange={(value) =>
                       setEditSite((prev) => ({
                         ...prev,
