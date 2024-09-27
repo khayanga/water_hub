@@ -40,48 +40,56 @@ const chartConfig = {
 
 // Function to transform API data into chart data
 const transformData = (deviceData) => {
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const months = [
+    "Jan", "Feb", "Mar", "Apr", "May", "June",
+    "July", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
 
-  return months.map((month, index) => {
-    const monthIndex = (index + 1).toString();
+  return months.map((_, index) => {
+    const monthIndex = (index + 1).toString(); // Convert index to string
     return {
-      month,
-      mpesa: deviceData.mpesa_transactions[monthIndex] || 0,
-      topup: deviceData.tag_topup_transactions[monthIndex] || 0,
-      tagpay: deviceData.tag_pay_transactions[monthIndex] || 0,
+      month: months[index],
+      mpesa: Math.max(0, deviceData.mpesa_transactions[monthIndex] ?? 0),  
+      topup: Math.max(0, deviceData.tag_topup_transactions[monthIndex] ?? 0),  
+      tagpay: Math.max(0, deviceData.tag_pay_transactions[monthIndex] ?? 0),  
     };
   });
 };
+
 
 const Clientchart = () => {
     const [chartData, setChartData] = useState([]);
     const token = getAccessToken(); 
 
     useEffect(() => {
-        const fetchData = async () => {
-          try {
-            const response = await fetch("https://api.waterhub.africa/api/v1/client/stats", {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`, 
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-              },
-            });
-            const data = await response.json();
-            console.log("Fetched Data:", data); // Log the fetched data
-            if (data && data.device_data && data.device_data.length > 0) {
-              const transformedData = transformData(data.device_data[0]);
-              setChartData(transformedData);
-            }
-          } catch (error) {
-            console.error("Error fetching data:", error);
+      const fetchData = async () => {
+        try {
+          const response = await fetch("https://api.waterhub.africa/api/v1/client/stats", {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`, 
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+            },
+          });
+          const data = await response.json();
+          console.log("Fetched Data:", data); // Log the fetched data
+          if (data && data.device_data && data.device_data.length > 0) {
+            const transformedData = transformData(data.device_data[0]);
+            console.log("Transformed data:", transformedData);
+            setChartData(transformedData);
           }
-        };
-    
-        fetchData();
-      }, [token]);
-   
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+  
+      fetchData();
+  }, [token]);
+
+  console.log("Chart Data:", chartData);
+
+
       
 
   return (
@@ -93,14 +101,14 @@ const Clientchart = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+         <ChartContainer config={chartConfig}>
           <AreaChart
-            accessibilityLayer
             data={chartData}
-            margin={{
+             margin={{
               left: 12,
               right: 12,
             }}
+            
           >
             <CartesianGrid vertical={false} />
             <XAxis
@@ -110,13 +118,13 @@ const Clientchart = () => {
               tickMargin={8}
               tickFormatter={(value) => value.slice(0, 3)}
             />
+            
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="dot" />}
             />
             <Area
               dataKey="mpesa"
-              type="natural"
               fill="var(--color-mpesa)"
               fillOpacity={0.4}
               stroke="var(--color-mpesa)"
@@ -124,7 +132,6 @@ const Clientchart = () => {
             />
             <Area
               dataKey="topup"
-              type="natural"
               fill="var(--color-topup)"
               fillOpacity={0.4}
               stroke="var(--color-topup)"
@@ -132,7 +139,6 @@ const Clientchart = () => {
             />
             <Area
               dataKey="tagpay"
-              type="natural"
               fill="var(--color-tagpay)"
               fillOpacity={0.4}
               stroke="var(--color-tagpay)"
@@ -145,7 +151,7 @@ const Clientchart = () => {
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 font-medium leading-none">
-              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+              Trends in months <TrendingUp className="h-4 w-4" />
             </div>
             <div className="flex items-center gap-2 leading-none text-muted-foreground">
               January - December 2024
