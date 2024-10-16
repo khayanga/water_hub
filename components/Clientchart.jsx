@@ -46,7 +46,7 @@ const transformData = (deviceData) => {
   ];
 
   return months.map((_, index) => {
-    const monthIndex = (index + 1).toString(); // Convert index to string
+    const monthIndex = (index + 1).toString(); 
     return {
       month: months[index],
       mpesa: Math.max(0, deviceData.mpesa_transactions[monthIndex] ?? 0),  

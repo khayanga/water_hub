@@ -10,70 +10,128 @@ export const navItems = [
   
   {
     id:"customers",
-    name:"customers",
+    name:"Customers",
     icon:UsersRound,
-    links: [
-      { href: '/customers', label: 'Customers' },
-      // { href: '/clients', label: 'Clients' },
-      // { href: '/partners', label: 'Partners' },
-      // { href: '/admins', label: 'Admins' },
-    ],
+    href:'/customers',
+
+    
   },
   {
     id:"sites",
-    name:"Site Management",
+    name:"Sites ",
     href: '/sites',
     icon:MapPin,
     
   },
   {
     id:"water-atm",
-    name:"WaterATM Management",
+    name:"WaterATMs",
     href: '/water-atm',
     icon:Waves,
     
   },
   {
     id:"tags",
-    name:"Tag Management",
+    name:"Tags",
     href: '/tags',
     icon:Tags,
     
   },
   {
     id:"reports",
-    name:"reports",
+    name:"Transaction reports",
+    href:"/transaction",
     icon:Folders,
-    links: [
-      { href: '/transaction', label: 'Transaction Reports' },
-      // { href: '/consumption', label: 'Consumption Reports' },
-      // { href: '/revenue', label: 'Revenue Reports' },
-    ],
-  },
-
-  // {
-  //   id:"analytics",
-  //   name:"Analytics",
-  //   href: '/analytics',
-  //   icon:LineChart,
-    
-  // },
+   
+  }, 
   
   {
     id:"settings",
     name:"settings",
+    href:"/account",
     icon:Settings,
-    links: [
-      { href: '/account', label: 'Account' },
-      // { href: '/business', label: 'Business' },
-      // { href: '/content', label: 'Content' },
-      // { href: '/version', label: 'Version' },
-      // { href: '/system', label: 'System' },
-    ],
-  },
- 
+    
+  }
   
 ];
+
+export const adminNav = [
+  {  id: 'client-dashboard',
+     name: 'Dashboard',
+     href: '/client-dashboard',
+     icon: Home,
+  },
+   
+   {
+     id:"customers",
+     name:"customers",
+     icon:UsersRound,
+     href:'/customers',
+ 
+     links: [
+       // { href: '/customers', label: 'Customers' },
+       // { href: '/clients', label: 'Clients' },
+       // { href: '/partners', label: 'Partners' },
+       // { href: '/admins', label: 'Admins' },
+     ],
+   },
+   {
+     id:"sites",
+     name:"Site Management",
+     href: '/sites',
+     icon:MapPin,
+     
+   },
+   {
+     id:"water-atm",
+     name:"WaterATM Management",
+     href: '/water-atm',
+     icon:Waves,
+     
+   },
+   {
+     id:"tags",
+     name:"Tag Management",
+     href: '/tags',
+     icon:Tags,
+     
+   },
+   {
+     id:"reports",
+     name:"reports",
+     href:"/transaction",
+     icon:Folders,
+     links: [
+       // { href: '/transaction', label: 'Transaction Reports' },
+       // { href: '/consumption', label: 'Consumption Reports' },
+       // { href: '/revenue', label: 'Revenue Reports' },
+     ],
+   },
+ 
+   // {
+   //   id:"analytics",
+   //   name:"Analytics",
+   //   href: '/analytics',
+   //   icon:LineChart,
+     
+   // },
+   
+   {
+     id:"settings",
+     name:"settings",
+     href:"/account",
+     icon:Settings,
+     links: [
+       // { href: '/account', label: 'Account' },
+       // { href: '/business', label: 'Business' },
+       // { href: '/content', label: 'Content' },
+       // { href: '/version', label: 'Version' },
+       // { href: '/system', label: 'System' },
+     ],
+   },
+  
+   
+ ];
 
 
 export const cards = [

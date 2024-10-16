@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/components/AuthProvider";
 import LoadingSpinner from "./loading/LoadingSpinner";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({ children }) {
           >
             <Suspense fallback={<LoadingSpinner />}>
               {children}
+              <Toaster />
             </Suspense>
           </ThemeProvider>
         </AuthProvider>

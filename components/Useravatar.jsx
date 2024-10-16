@@ -10,10 +10,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+
 import Link from 'next/link';
 import { MoonIcon, SunIcon } from "@radix-ui/react-icons"
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
+import { AlignLeft } from 'lucide-react';
+import { navItems } from '@/data';
 
 const Useravatar = () => {
   const [userName, setUserName] = useState('');
@@ -69,12 +80,46 @@ const Useravatar = () => {
   };
 
   return (
-    <div className=''>
-      <div className="flex flex-row justify-between gap-4 items-center">
+    <header className=' sticky top-0 z-30 flex h-14 sm:justify-between items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6' >
+
+      <div className="text-lg font-semibold sm:hidden">
+      <Sheet>
+        <SheetTrigger asChild>
+              <Button size="icon" variant="outline" className="sm:hidden">
+                <AlignLeft className="h-6 w-6 font-bold" />
+                <span className="sr-only">Toggle Menu</span>
+              </Button>
+            </SheetTrigger>
+
+      
+      <SheetContent side="left" className="sm:max-w-xs">
+        <nav className="grid gap-6 text-lg font-medium">
+          {navItems.map((item)=>
+          <Link
+          key={item.id}
+          href={item.href}
+          className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground">
+
+            <item.icon className="h-5 w-5 " />
+            <span  className="text-gray-800 dark:text-white">{item.name}</span>
+          
+          </Link>
+          
+          )}
+
+        </nav>
+      </SheetContent>
+      </Sheet>
+
+      </div>
+      <div>
         <h2 className='font-bold  md:text-[22px] text-[20px] hidden md:block text-blue-500 dark:text-white'>
           Welcome Back, {userName || 'Guest'}
         </h2>
 
+        </div>
+
+      <div className="flex flex-row justify-between gap-4 items-center ml-auto">
 
         <div className=' flex flex-row gap-4'>
         <DropdownMenu>
@@ -123,7 +168,7 @@ const Useravatar = () => {
         </div>
 
       </div>
-    </div>
+    </header>
   );
 };
 

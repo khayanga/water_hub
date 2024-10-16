@@ -47,6 +47,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Useravatar from "@/components/Useravatar";
 import { getAccessToken } from "@/components/utils/auth";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 const Page = () => {
   const [formData, setFormData] = useState({
@@ -65,6 +67,8 @@ const Page = () => {
   const [editCustomer, setEditCustomer] = useState(null);
 
   const token = getAccessToken();
+
+  const {toast} = useToast();
 
  
   useEffect(() => {
@@ -210,6 +214,11 @@ const Page = () => {
       
         setCustomers((prevCustomers) => [addedCustomer, ...prevCustomers]);
 
+        toast({
+          title: "Customer added successfully!",
+          description: `Client ${formData.name} was added.`,
+        });
+
         setFormData({
           name: "",
           phone: "",
@@ -220,6 +229,12 @@ const Page = () => {
         setFormError("");
       } else {
         setFormError(data.message || "Failed to add customer");
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "There was a problem adding the customer.",
+          action: <ToastAction altText="Try again">Try again</ToastAction>,
+        })
       }
     } catch (error) {
       console.error("Error:", error);
@@ -275,6 +290,9 @@ const Page = () => {
           ...prev,
           [id]: value,
         }));
+        toast({
+          description: "Customer has been edited successfully.",
+        });
       };
     
       
@@ -332,27 +350,25 @@ const Page = () => {
  
   
   return (
-    <div className="w-11/12 mx-auto">
+    <div className="flex min-h-screen w-full flex-col ">
       <Sidebar />
 
-      <div className="p-4 w-full mx-auto">
-        <div className="flex flex-row justify-between p-2 w-full">
-          <div className="flex flex-row items-center gap-6">
-            <h1 className="font-bold tracking-wider">Customers Management</h1>
-            <Button className="bg-blue-500 px-6 py-1 text-white">
-              {customers.length} 
-            </Button>
-          </div>
-          <div>
+      <div className="p-4 flex flex-col sm:gap-4 sm:py-4 sm:pl-14 ">
             <Useravatar />
-          </div>
-        </div>
+        <main className=" px-4 py-2 sm:px-6 sm:py-0 ">
+          <div className="flex flex-row items-center gap-6">
+              <h1 className="font-bold tracking-wider">Customers Management</h1>
+              <Button className="bg-blue-500 px-6 py-1 text-white">
+                {customers.length} 
+              </Button>
+            </div>
+        
 
         <p className="mt-2 tracking-wider text-sm font-light pl-2">
           Fill in the form below to register a customer.
         </p>
 
-        <form className="w-full mt-5 pl-2" onSubmit={handleSubmit}>
+        <form className="w-full mt-5 " onSubmit={handleSubmit}>
           <Card>
             <CardContent className="space-y-2">
               {formError && <div className="text-red-500 mb-2">{formError}</div>}
@@ -409,11 +425,11 @@ const Page = () => {
           </Card>
         </form>
 
-        <div className="flex flex-row items-center justify-between gap-6 pl-4 mt-8">
+        <div className="flex flex-row items-center justify-between gap-6  mt-8">
           <h1 className="font-bold tracking-wide mb-2">Customers List</h1>
         </div>
 
-        <Card className="ml-4">
+        <Card >
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -476,9 +492,8 @@ const Page = () => {
     
         </Card>
 
-
          {/* Viewing details modal */}
-        {selectedCustomer && (
+          {selectedCustomer && (
           <Dialog open={!!selectedCustomer} onOpenChange={closeDialog}>
             <DialogContent>
               <DialogHeader>
@@ -535,6 +550,13 @@ const Page = () => {
             </DialogContent>
           </Dialog>
         )}
+
+        </main>
+
+        
+
+
+        
 
       </div>
     </div>

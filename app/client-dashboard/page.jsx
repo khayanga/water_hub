@@ -20,29 +20,25 @@ const Page = () => {
 
   return (
     <ProtectedRoute>
-      <div className=' flex min-h-screen w-full flex-col gap-3 px-2 py-4'>
+      <div className='flex min-h-screen w-full flex-col'>
       <Sidebar />
 
-      <div className=' w-11/12 mx-auto px-8 py-2'>
-      <div className=' '>
-
-        <Useravatar/>
-        
-        <p className='mt-2 tracking-wider text-sm font-light text-black dark:text-white'>
+      <div className=' flex flex-col sm:gap-4 sm:py-4 sm:pl-14 '>
+      <Useravatar/>
+      <main className=" px-4 py-2 sm:px-6 sm:py-0  ">
+      
+        <p className=' my-2 tracking-wider text-sm font-light text-black dark:text-white'>
           The following are insights of progress
         </p>
 
-        
-      </div>
-
-      {/* Cards */}
-      <div >
+        {/* Cards */}
+        <div >
 
         <DashboardCards/>
           
-      </div>
+        </div>
 
-      <div className='mt-12 flex flex-col md:flex-row gap-6 p-2 mx-auto'>
+        <div className='mt-12 flex flex-col md:flex-row gap-6 p-2 mx-auto'>
         {/* Charts */}
         <div className="lg:w-2/4">
           <Clientchart/>
@@ -51,12 +47,16 @@ const Page = () => {
         {/* Table for transaction */}
         <div className="lg:w-1/2">
           {/* <DashboardTable/>
-           */}
+          */}
         </div>
 
 
+        </div>
+
+      </main>
+
+      
       </div>
-    </div>
      
     </div>
 

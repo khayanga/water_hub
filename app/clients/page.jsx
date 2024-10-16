@@ -33,6 +33,8 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 
+
+
 import Sidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +42,8 @@ import { Input } from "@/components/ui/input";
 import Useravatar from "@/components/Useravatar";
 
 const Page = () => {
+  
+ 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -98,6 +102,9 @@ const Page = () => {
       const updatedClients = [...prevClients, newClient];
       return updatedClients;
     });
+
+
+    
 
     setFormData({
       name: "",
@@ -183,6 +190,9 @@ const Page = () => {
             <Button className="bg-blue-500 px-6 py-1 text-white">
               {clients.length}
             </Button>
+            
+            
+            
           </div>
           <div>
             <Useravatar/>

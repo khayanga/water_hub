@@ -141,7 +141,7 @@ const DashboardCards = () => {
       };
      
   return (
-    <div className='grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4 mt-2 mx-auto'>
+    <div className='grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4  mx-auto'>
         {analyticsData ? (
             <>
               <Card className="bg-orange-200">
