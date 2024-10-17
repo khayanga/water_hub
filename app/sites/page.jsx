@@ -304,27 +304,27 @@ const Page = () => {
 
   
   return (
-    <div className="w-11/12 mx-auto">
+    <div className="flex min-h-screen w-full flex-col">
       <Sidebar />
 
-      <div className="p-4 w-full mx-auto">
-        <div className="flex flex-row justify-between p-2 w-full">
-          <div className="flex flex-row items-center gap-6">
+      <div className="p-4 flex flex-col sm:gap-4 sm:py-4 sm:pl-14 ">
+
+      <Useravatar />
+
+        <main className=" px-4 py-2 sm:px-6 sm:py-0 ">
+        <div className="flex flex-row items-center gap-6">
             <h1 className="font-bold tracking-wider">Site Management</h1>
             <Button className="bg-blue-500 px-6 py-1 text-white">
               {sites.length}
             </Button>
           </div>
-          <div>
-            <Useravatar />
-          </div>
-        </div>
 
-        <p className="mt-2 tracking-wider text-sm font-light pl-2 ">
+          <p className="mt-2 tracking-wider text-sm font-light pl-2 ">
           The table below has a list of all the sites.
-        </p>
+          </p>
 
-        <form className="w-full mt-5 pl-2 hidden " onSubmit={handleSubmit}>
+
+        <form className="w-full mt-5  hidden " onSubmit={handleSubmit}>
           <Card>
             <CardContent className="space-y-2">
               {formError && (
@@ -417,11 +417,11 @@ const Page = () => {
           </Card>
         </form>
 
-        <div className="flex flex-row items-center justify-between gap-6 pl-4 mt-8">
+        <div className="flex flex-row items-center justify-between gap-6 mt-8">
           <h1 className="font-bold tracking-wide mb-2">Sites List</h1>
         </div>
 
-        <Card className="ml-4">
+        <Card >
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -484,22 +484,21 @@ const Page = () => {
     
         </Card>
 
-      </div>
-
-      {/* View Site Dialog */}
+          {/* View Site Dialog */}
       <Dialog open={!!selectedSite} onOpenChange={closeDialog}>
-      <DialogContent className="max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>{selectedSite?.site_name}</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-2">
-          <div>Country: {selectedSite?.country}</div>
-          <div>Location: {selectedSite?.site_location}</div>
-          <div>Latitude: {selectedSite?.latitude}</div>
-          <div>Longitude: {selectedSite?.longitude}</div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        <DialogContent className="max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>{selectedSite?.site_name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <div>Country: {selectedSite?.country}</div>
+            <div>Location: {selectedSite?.site_location}</div>
+            <div>Latitude: {selectedSite?.latitude}</div>
+            <div>Longitude: {selectedSite?.longitude}</div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
 
 
       {/* Edit Site Dialog */}
@@ -568,6 +567,13 @@ const Page = () => {
           </Button>
         </DialogContent>
       </Dialog>
+
+
+        </main>
+
+      </div>
+
+     
     </div>
   );
 };

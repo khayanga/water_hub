@@ -160,13 +160,13 @@ const Page = () => {
               <DropdownMenuItem onClick={() => openDialog(row.original)}>
                 View
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => openEditDialog(row.original)}>
+              {/* <DropdownMenuItem onClick={() => openEditDialog(row.original)}>
                 Edit
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               
-              <DropdownMenuItem onClick={() => handleDelete(row.original.id, row.index)}>
+              {/* <DropdownMenuItem onClick={() => handleDelete(row.original.id, row.index)}>
                 Delete
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -273,27 +273,25 @@ const Page = () => {
   
 
   return (
-    <div className="w-11/12 mx-auto">
+    <div className="flex min-h-screen w-full flex-col">
       <Sidebar />
 
-      <div className="p-4 w-full mx-auto">
-        <div className="flex flex-row justify-between p-2 w-full">
-          <div className="flex flex-row items-center gap-6">
+      <div className="p-4 flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+      <Useravatar />
+
+        <main className=" px-4 py-2 sm:px-6 sm:py-0 ">
+        <div className="flex flex-row items-center gap-6">
             <h1 className="font-bold tracking-wider">Tag Management</h1>
             <Button className="bg-blue-500 px-6 py-1 text-white">
               {tags.length}
             </Button>
           </div>
-          <div>
-            <Useravatar />
-          </div>
-        </div>
 
-        <p className="mt-2 tracking-wider text-sm font-light pl-2 ">
+          <p className="mt-2 tracking-wider text-sm font-light ">
           The table below shows a list of all registered tags.
         </p>
 
-        <form className="w-full mt-5 pl-2 hidden" onSubmit={handleSubmit}>
+        <form className="w-full mt-5  hidden" onSubmit={handleSubmit}>
           <Card>
             <CardContent className="space-y-2">
               {formError && (
@@ -375,13 +373,12 @@ const Page = () => {
             </CardFooter>
           </Card>
         </form>
-
-        <div className="flex flex-row items-center justify-between gap-6 pl-4 mt-8">
+        <div className="flex flex-row items-center justify-between gap-6 mt-8">
           <h1 className="font-bold tracking-wide mb-2">Registered Tags</h1>
         </div>
 
         <div className="w-full mt-2">
-        <Card className="ml-4">
+        <Card>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -444,9 +441,8 @@ const Page = () => {
     
         </Card>
         </div>
-      </div>
 
-      {/* View Tag Dialog */}
+        {/* View Tag Dialog */}
       <Dialog open={Boolean(selectedTag)} onOpenChange={closeDialog}>
         <DialogContent>
           <DialogHeader>
@@ -539,6 +535,12 @@ const Page = () => {
           </Button>
         </DialogContent>
       </Dialog>
+
+        </main>
+     
+      </div>
+
+      
     </div>
   );
 };

@@ -364,7 +364,7 @@ const Page = () => {
             </div>
         
 
-        <p className="mt-2 tracking-wider text-sm font-light pl-2">
+        <p className="mt-2 tracking-wider text-sm font-light ">
           Fill in the form below to register a customer.
         </p>
 
@@ -552,9 +552,6 @@ const Page = () => {
         )}
 
         </main>
-
-        
-
 
         
 

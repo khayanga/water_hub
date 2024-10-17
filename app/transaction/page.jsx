@@ -212,21 +212,21 @@ const page = () => {
  
 
   return (
-    <div className="w-11/12 mx-auto">
+    <div className="flex min-h-screen w-full flex-col">
       <Sidebar />
-      <div className="p-4 w-full mx-auto">
-        <div className="flex flex-row justify-between p-2 w-full">
-          <div className="flex flex-row items-center gap-6">
+      <div className="p-4 flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+      <Useravatar />
+
+        <main className=" px-4 py-2 sm:px-6 sm:py-0 ">
+        <div className="flex flex-row items-center gap-6">
             <h1 className="font-bold tracking-wider">Transaction Reports.</h1>
           </div>
-          <div>
-            <Useravatar />
-          </div>
-        </div>
-        <p className="mt-1 tracking-wider text-sm font-light pl-2">
+
+          <p className="mt-1 tracking-wider text-sm font-light ">
           Get transaction reports down below
-        </p>
-        <Tabs defaultValue="mpesa" className="w-full">
+          </p>
+
+          <Tabs defaultValue="mpesa" className="w-full">
           <TabsList className="flex flex-row gap-5 w-[370px] my-5">
             <TabsTrigger value="mpesa">Mpesa</TabsTrigger>
             <TabsTrigger value="tag">Tag</TabsTrigger>
@@ -237,7 +237,7 @@ const page = () => {
           {/* Mpesa Transactions */}
           <TabsContent value="mpesa">
             <div className="w-full mt-2">
-            <Card className="ml-4">
+            <Card >
               <Table>
                 <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
@@ -302,7 +302,7 @@ const page = () => {
           {/* Tag Transactions */}
           <TabsContent value="tag">
             <div className="w-full mt-2">
-            <Card className="ml-4">
+            <Card >
                 <Table>
                   <TableHeader>
                     {tagTable.getHeaderGroups().map((headerGroup) => (
@@ -378,7 +378,7 @@ const page = () => {
                 </Popover>
                 <Button className="bg-blue-500 hover:bg-none px-6 py-1 text-white">Generate</Button>
               </div>
-              <Card className="ml-4 mt-5">
+              <Card className=" mt-5">
                 <Table>
                   <TableCaption>Tag Transactions</TableCaption>
                   <TableHeader>
@@ -406,6 +406,11 @@ const page = () => {
             </div>
           </TabsContent>
         </Tabs>
+
+        </main>
+        
+        
+        
       </div>
     </div>
   );
