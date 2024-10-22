@@ -14,6 +14,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Spinner from '@/components/Spinner';
+import { BackgroundBeams } from '@/components/ui/background-beams';
+import Image from 'next/image';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -64,60 +66,72 @@ const SignIn = () => {
   
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center relative antialiased">
       {loading ? (
         <Spinner /> 
       ) : (
-        <Card className="mx-auto max-w-sm">
 
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Welcome Back !</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
-        </CardHeader>
+        <>
+        <BackgroundBeams/>
+         <Card className="mx-auto max-w-sm z-10">
 
-        <CardContent>
-        <div className="grid gap-4">
-        {error && <div className="bg-red-500 text-white p-3 rounded mb-4">{error}</div>}
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              type="email" 
-               placeholder="Email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              required
-            />
+          <div className='pl-4 pt-2'>
+            <Image src="/images/logo.png"
+            width={100}
+            height={100}/>
           </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">Password</Label>
-              <Link href="#" className="ml-auto inline-block text-sm text-blue-500">
-                Forgot your password?
-              </Link>
+
+
+          <CardHeader>
+            <CardTitle className="text-2xl text-center">Welcome Back !</CardTitle>
+            <CardDescription>
+              Enter your email below to login to your account
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent>
+          <div className="grid gap-4">
+          {error && <div className="bg-red-500 text-white p-3 rounded mb-4">{error}</div>}
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                type="email" 
+                placeholder="Email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                required
+              />
             </div>
-            <Input 
-            type="password" 
-            placeholder="Password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} required />
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">Password</Label>
+                <Link href="#" className="ml-auto inline-block text-sm text-blue-500">
+                  Forgot your password?
+                </Link>
+              </div>
+              <Input 
+              type="password" 
+              placeholder="Password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} required />
+            </div>
+            <Button type="submit" onClick={handleSignIn} disabled={loading} className="w-full bg-blue-500 rounded text-white hover:bg-blue-500">
+              Sign In
+            </Button>
+            
           </div>
-          <Button type="submit" onClick={handleSignIn} disabled={loading} className="w-full bg-blue-500 rounded text-white hover:bg-blue-500">
-            Sign In
-          </Button>
-          
-        </div>
-        <div className="mt-4 text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link href="/sign-up" className="underline text-blue-500">
-            Sign up
-          </Link>
-        </div>
-        </CardContent>
+          <div className="mt-4 text-center text-sm">
+            Don&apos;t have an account?{" "}
+            <Link href="/sign-up" className="underline text-blue-500">
+              Sign up
+            </Link>
+          </div>
+          </CardContent>
 
 
-        </Card>
+          </Card>
+        </>
+       
       )}
     </div>
   );

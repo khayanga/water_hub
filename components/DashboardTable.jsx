@@ -34,72 +34,69 @@ import { Badge } from "./ui/badge";
 
 const DashboardTable = () => {
 
-    const [transactions, setTransactions] = useState([]);
+    const [customers, setCustomers] = useState([]);
   
   const token = getAccessToken();
   
-  const fetchTransactions = async () => {
-    try {
-      const response = await fetch("https://api.waterhub.africa/api/v1/client/transactions/mpesa?limit=4", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
-
-      
-      const data = await response.json();
-      if (data && data.device_transactions) {
-        setTransactions(data.device_transactions);
-      } else {
-        console.error("Unexpected response structure", data);
-      }
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-    }
-  };
+  
 
   useEffect(() => {
-    fetchTransactions();
-  }, []);
+    const fetchCustomers = async () => {
+      try {
+        const response = await fetch(
+          "https://api.waterhub.africa/api/v1/client/customer/list?limit=7",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched data:", data);
+          setCustomers(data.data || []);
+        } else {
+          console.error("Error response:", response);
+          setFormError("Failed to fetch customers");
+        }
+      } catch (error) {
+        console.error("Error fetching customers:", error);
+        setFormError("An error occurred while fetching customers.");
+      }
+    };
+
+    fetchCustomers();
+  }, [token]);
+
 
   const columns = [
-    // {
-    //   accessorKey: "mobile_no",
-    //   header: "Mpesa No",
-    //   cell: ({ row }) => <div>{row.original.mobile_no}</div>,
-    // },
+    
     {
-      accessorKey: "transaction_code",
-      header: "Transaction Code",
-      cell: ({ row }) => <div>{row.original.transaction_code}</div>,
+      accessorKey: "name",
+      header: "Customer Name",
+      cell: ({ row }) => <div>{row.original.name}</div>,
     },
     {
-      accessorKey: "status",
-      header: "Status",
+      accessorKey: "phone",
+      header: "Phone Number",
+      cell: ({ row }) => <div>{row.original.phone}</div>,
+    },
+    {
+      accessorKey: "created_at",
+      header: "Date Created",
       cell: ({ row }) => {
-        const status = row.original.status;
-        return (
-          <Badge
-            variant="outline"
-            className={status === "Fail" ? "text-red-500" : "text-blue-500"}
-          >
-            {status}
-          </Badge>
-        );
+       
+        return <div>{row.original.created_at}</div>;
       },
     },
-    {
-      accessorKey: "amount",
-      header: "Amount",
-      cell: ({ row }) => <div>{row.original.amount}</div>,
-    },
+    
   ];
 
   const table = useReactTable({
-    data: transactions.slice(0, 4),
+    data: customers,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -108,8 +105,8 @@ const DashboardTable = () => {
   return (
     <>
     <div className="">
-          <Link href="/transaction" className="flex flex-row items-center">
-          <Button className="ml-auto gap-1 mb-2 bg-blue-500 px-6 py-2 flex flex-row items-center text-white">
+          <Link href="/customers" className="flex flex-row items-center">
+          <Button className="ml-auto gap-1 mb-2 bg-blue-500 px-4 py-2 flex flex-row items-center text-white">
                 View All
              <FiArrowUpRight className="h-4 w-4 ml-1" />
               
@@ -149,7 +146,7 @@ const DashboardTable = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="text-center">
-                    No transactions found.
+                    No customers found.
                   </TableCell>
                 </TableRow>
               )}

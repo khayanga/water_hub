@@ -16,6 +16,8 @@ import { auth } from '@/app/firebase/config';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Spinner from '@/components/Spinner';
+import Image from 'next/image';
+import { BackgroundBeams } from '@/components/ui/background-beams';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -45,65 +47,75 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      {loading ? (<Spinner/>) :(
-        <Card className="mx-auto max-w-sm">
 
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Welcome New User </CardTitle>
-          <CardDescription>
-            Enter your email below to sign up
-          </CardDescription>
-        </CardHeader>
+    <div className="min-h-screen flex items-center justify-center relative antialiased">
+      {loading ? (
+        <Spinner /> 
+      ) : (
 
-        <CardContent>
-        <div className="grid gap-4">
-        {error && <div className="bg-red-500 text-white p-3 rounded mb-4">{error}</div>}
-        {createUserError && <p className="text-red-500 mb-4">{createUserError.message}</p>}
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              type="email" 
-              placeholder="Email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              required
-            />
+        <>
+        <BackgroundBeams/>
+         <Card className="mx-auto max-w-sm z-10">
+
+          <div className='pl-4 pt-2'>
+            <Image src="/images/logo.png"
+            width={100}
+            height={100}/>
           </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">Password</Label>
-              <Link href="#" className="ml-auto inline-block text-sm text-blue-500">
-                Forgot your password?
-              </Link>
+
+
+          <CardHeader>
+            <CardTitle className="text-2xl text-center">Get Started !</CardTitle>
+            <CardDescription>
+              Enter your email below and get started below
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent>
+          <div className="grid gap-4">
+          {error && <div className="bg-red-500 text-white p-3 rounded mb-4">{error}</div>}
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                type="email" 
+                placeholder="Email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                required
+              />
             </div>
-            <Input 
-            type="password" 
-            placeholder="Password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required />
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">Password</Label>
+                
+              </div>
+              <Input 
+              type="password" 
+              placeholder="Password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} required />
+            </div>
+            <Button type="submit"  onClick={handleSignUp} 
+            disabled={loading} className="w-full bg-blue-500 rounded text-white hover:bg-blue-500">
+              Sign Up
+            </Button>
+            
           </div>
-          <Button type="submit"  onClick={handleSignUp} 
-          disabled={loading} className="w-full bg-blue-500 rounded text-white hover:bg-blue-500">
-            Sign In
-          </Button>
-          
-        </div>
-        <div className="mt-4 text-center text-sm">
-         Already have an account?{" "}
-          <Link href="/sign-in" className="underline text-blue-500">
-            Sign In
-          </Link>
-        </div>
-        </CardContent>
+          <div className="mt-4 text-center text-sm">
+            Already have an account?{" "}
+            <Link href="/sign-in" className="underline text-blue-500">
+              Sign In
+            </Link>
+          </div>
+          </CardContent>
 
 
-      </Card>
+          </Card>
+        </>
+       
       )}
-      
-      
     </div>
+    
   );
 };
 

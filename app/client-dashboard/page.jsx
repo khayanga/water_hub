@@ -46,8 +46,8 @@ const Page = () => {
 
         {/* Table for transaction */}
         <div className="lg:w-1/2">
-          {/* <DashboardTable/>
-          */}
+          <DashboardTable/>
+         
         </div>
 
 
