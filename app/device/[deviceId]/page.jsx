@@ -324,6 +324,7 @@ const Page = ({params}) => {
                     <div className="space-y-1">
                       <Label htmlFor="tap_unit_pulse_1">Tap No 1 - Unit Pulse/Liter</Label>
                       <Input
+                        placeholder="Enter unit pulse"
                         id="tap_unit_pulse_1"
                         type="text"
                         value={tapCalibration.tap_unit_pulse_1}
@@ -333,6 +334,7 @@ const Page = ({params}) => {
                     <div className="space-y-1">
                       <Label htmlFor="tap_unit_volume_1">Tap No 1 - Unit Volume in Litres</Label>
                       <Input
+                      placeholder='Enter unit volume'
                         id="tap_unit_volume_1"
                         type="text"
                         value={tapCalibration.tap_unit_volume_1}
@@ -345,6 +347,7 @@ const Page = ({params}) => {
                     <div className="space-y-1">
                       <Label htmlFor="tap_unit_pulse_2">Tap No 2 - Unit Pulse/Liter</Label>
                       <Input
+                      placeholder="Enter unit pulse"
                         id="tap_unit_pulse_2"
                         type="text"
                         value={tapCalibration.tap_unit_pulse_2}
@@ -354,6 +357,7 @@ const Page = ({params}) => {
                     <div className="space-y-1">
                       <Label htmlFor="tap_unit_volume_2">Tap No 2 - Unit Volume in Litres</Label>
                       <Input
+                      placeholder='Enter unit volume'
                         id="tap_unit_volume_2"
                         type="text"
                         value={tapCalibration.tap_unit_volume_2}

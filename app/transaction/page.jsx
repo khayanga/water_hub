@@ -378,7 +378,7 @@ const page = () => {
                 </Popover>
                 <Button className="bg-blue-500 hover:bg-none px-6 py-1 text-white">Generate</Button>
               </div>
-              <Card className=" mt-5">
+              {/* <Card className=" mt-5">
                 <Table>
                   <TableCaption>Tag Transactions</TableCaption>
                   <TableHeader>
@@ -402,7 +402,7 @@ const page = () => {
                     ))}
                   </TableBody>
                 </Table>
-              </Card>
+              </Card> */}
             </div>
           </TabsContent>
         </Tabs>

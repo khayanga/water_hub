@@ -44,7 +44,7 @@ const DashboardTable = () => {
     const fetchCustomers = async () => {
       try {
         const response = await fetch(
-          "https://api.waterhub.africa/api/v1/client/customer/list?limit=7",
+          "https://api.waterhub.africa/api/v1/client/customer/list?per_page=7",
           {
             method: "GET",
             headers: {

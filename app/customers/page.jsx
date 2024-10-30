@@ -62,7 +62,6 @@ const Page = () => {
   
   const [customers, setCustomers] = useState([]);
   const [formError, setFormError] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [editCustomer, setEditCustomer] = useState(null);
 

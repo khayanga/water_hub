@@ -79,7 +79,7 @@ const Page = () => {
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [formError, setFormError] = useState("");
   const [editTag, setEditTag] = useState(null);
-  
+//
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -164,9 +164,9 @@ const Page = () => {
                 Edit
               </DropdownMenuItem> */}
               
-              {/* <DropdownMenuItem onClick={() => handleDelete(row.original.id, row.index)}>
+              <DropdownMenuItem onClick={() => handleDelete(row.original.id, row.index)}>
                 Delete
-              </DropdownMenuItem> */}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -211,33 +211,39 @@ const Page = () => {
     });
     setFormError("");
   };
-
-  const handleDelete = (index) => {
-    setTags((prevTags) => prevTags.filter((_, i) => i !== index));
-  };
-
-  const sortData = (key) => {
-    let direction = "ascending";
-    if (sortConfig.key === key && sortConfig.direction === "ascending") {
-      direction = "descending";
+  
+  const handleDelete = async (tagId, index) => {
+    try {
+      const response = await fetch(
+        `https://api.waterhub.africa/api/v1/client/tag/revoke/${tagId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (response.ok) {
+       console.log("Tag deleted successfully")
+       setTags((prevTags) => prevTags.filter((_, i) => i !== index));
+      } else {
+        
+        const data = await response.json();
+        console.error("Error deleting tag:", data.message);
+        
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      
     }
-
-    const sortedTags = [...tags].sort((a, b) => {
-      if (a[key] < b[key]) {
-        return direction === "ascending" ? -1 : 1;
-      }
-      if (a[key] > b[key]) {
-        return direction === "ascending" ? 1 : -1;
-      }
-      return 0;
-    });
-
-    setSortConfig({ key, direction });
-    setTags(sortedTags);
   };
+ 
 
+  
   const openDialog = (tag) => {
-    setSelectedTag(tag);
+    window.location.href = `/tag/${tag.id}`;
   };
 
   const closeDialog = () => {
@@ -442,21 +448,7 @@ const Page = () => {
         </Card>
         </div>
 
-        {/* View Tag Dialog */}
-      <Dialog open={Boolean(selectedTag)} onOpenChange={closeDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Tag Details</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            <p>Tag ID: {selectedTag?.tag_id}</p>
-            <p>Customer Name: {selectedTag?.customer.customer_name}</p>
-            <p>Token Balance: {selectedTag?.token_balance}</p>
-            <p>Device Serial Number: {selectedTag?.device}</p>
-          </div>
-          
-        </DialogContent>
-      </Dialog>
+        
 
       {/* Edit Tag Dialog */}
       <Dialog open={Boolean(editTag)} onOpenChange={closeEditDialog}>

@@ -252,7 +252,7 @@ const Page = () => {
   const handleDelete = (index) => {
     setDevices((prevDevices) => prevDevices.filter((_, i) => i !== index));
   };
-
+//
   const openDialog = (device) => {
     window.location.href = `/device/${device.id}`;
   };
