@@ -227,11 +227,11 @@ const page = () => {
           </p>
 
           <Tabs defaultValue="mpesa" className="w-full">
-          <TabsList className="flex flex-row gap-5 w-[370px] my-5">
+          <TabsList className="flex flex-row gap-5 w-[180px] my-5">
             <TabsTrigger value="mpesa">Mpesa</TabsTrigger>
             <TabsTrigger value="tag">Tag</TabsTrigger>
-            <TabsTrigger value="tag_pay">Tag Pay</TabsTrigger>
-            <TabsTrigger value="tag_top_up">Tag Top Up</TabsTrigger>
+            {/* <TabsTrigger value="tag_pay">Tag Pay</TabsTrigger>
+            <TabsTrigger value="tag_top_up">Tag Top Up</TabsTrigger> */}
           </TabsList>
 
           {/* Mpesa Transactions */}
@@ -362,49 +362,7 @@ const page = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="tag_pay">
-            <div className="w-full mt-2">
-              <div className="ml-5 space-x-3 flex items-center">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
-                  </PopoverContent>
-                </Popover>
-                <Button className="bg-blue-500 hover:bg-none px-6 py-1 text-white">Generate</Button>
-              </div>
-              {/* <Card className=" mt-5">
-                <Table>
-                  <TableCaption>Tag Transactions</TableCaption>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Tag ID</TableHead>
-                      <TableHead>Transaction Code</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date Created</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {tagTransactions.map((transaction, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{transaction.tag.tag_id}</TableCell>
-                        <TableCell>{transaction.transaction_code}</TableCell>
-                        <TableCell>{transaction.amount}</TableCell>
-                        <TableCell><Badge variant="outline">{transaction.status}</Badge></TableCell>
-                        <TableCell>{transaction.created_at}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Card> */}
-            </div>
-          </TabsContent>
+         
         </Tabs>
 
         </main>

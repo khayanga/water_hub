@@ -54,8 +54,8 @@ const Page = () => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    password: "",
-    confirmPassword: "",
+    // password: "",
+    // confirmPassword: "",
     
   });
   
@@ -179,10 +179,10 @@ const Page = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      setFormError("Passwords do not match.");
-      return;
-    }
+    // if (formData.password !== formData.confirmPassword) {
+    //   setFormError("Passwords do not match.");
+    //   return;
+    // }
 
     const newCustomer = {
       name: formData.name,
@@ -215,14 +215,14 @@ const Page = () => {
 
         toast({
           title: "Customer added successfully!",
-          description: `Client ${formData.name} was added.`,
+          description: `Customer ${formData.name} was added.`,
         });
 
         setFormData({
           name: "",
           phone: "",
-          password: "",
-          confirmPassword: "",
+          // password: "",
+          // confirmPassword: "",
           
         });
         setFormError("");
@@ -232,7 +232,7 @@ const Page = () => {
           variant: "destructive",
           title: "Uh oh! Something went wrong.",
           description: "There was a problem adding the customer.",
-          action: <ToastAction altText="Try again">Try again</ToastAction>,
+          // action: <ToastAction altText="Try again">Try again</ToastAction>,
         })
       }
     } catch (error) {
@@ -257,7 +257,11 @@ const Page = () => {
       );
   
       if (response.ok) {
-       console.log("Customer deleted successfully")
+      //  console.log("Customer deleted successfully")
+      toast({
+        variant: "destructive",
+        description: "Customer has been deleted.",
+      });
         setCustomers((prevCustomers) =>
           prevCustomers.filter((_, i) => i !== index)
         );
@@ -327,7 +331,7 @@ const Page = () => {
             );
             
             console.log("Customer updated successfully");
-            closeEditDialog(); // Close the dialog after saving
+            closeEditDialog();
           } else {
             const data = await response.json();
             setFormError(data.message || "Failed to update customer");
@@ -367,10 +371,10 @@ const Page = () => {
           Fill in the form below to register a customer.
         </p>
 
-        <form className="w-full mt-5 " onSubmit={handleSubmit}>
+        <form className="w-full md:max-w-3xl mt-5 " onSubmit={handleSubmit}>
           <Card>
             <CardContent className="space-y-2">
-              {formError && <div className="text-red-500 mb-2">{formError}</div>}
+              {/* {formError && <div className="text-red-500 mb-2">{formError}</div>} */}
               <div className="flex flex-wrap gap-8 p-2">
                 <div className="space-y-1">
                   <Label htmlFor="name">Customer Name</Label>
@@ -393,7 +397,7 @@ const Page = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="space-y-1">
+                {/* <div className="space-y-1">
                   <Label htmlFor="password">New Password</Label>
                   <Input
                     id="password"
@@ -412,7 +416,7 @@ const Page = () => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                   />
-                </div>
+                </div> */}
                 
               </div>
             </CardContent>
