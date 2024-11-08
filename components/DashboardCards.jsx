@@ -1,14 +1,6 @@
 'use client';
 import CountUp from 'react-countup';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import axios from "axios";
 import {
   Card,
@@ -18,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import Sidebar from '@/components/Sidebar';
 import {
   Dialog,
   DialogContent,
@@ -31,9 +22,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label";
 import { Bot, Tent, User } from 'lucide-react';
-import Confetti from "react-confetti";
+import Confetti from "react-confetti"
 import React, { useEffect, useState } from 'react'
 import { getAccessToken } from './utils/auth';
+import Link from 'next/link';
 
 const DashboardCards = () => {
     const [balance, setBalance] = useState(null); 
@@ -42,6 +34,14 @@ const DashboardCards = () => {
     const [analyticsData, setAnalyticsData] = useState(null);
     const [showConfetti, setShowConfetti] = useState(false);
     const [phone, setPhone] = useState('');
+    const [billingFormData, setBillingFormData] = useState({
+      bankName: '',
+      bankAccount: '',
+      mpesaNumber: '',
+      approverName: '',
+      approverEmail: '',
+      approverContact: '',
+    });
     const token = getAccessToken();
 
     useEffect(() => {
@@ -78,6 +78,45 @@ const DashboardCards = () => {
           fetchWalletBalance();
         }
       }, [token]);
+
+
+      useEffect(() => {
+        if (!token) return;
+    
+        const fetchBillingDetails = async () => {
+          try {
+            const response = await axios.get(
+              "https://api.waterhub.africa/api/v1/client/billing",
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                  Accept: "application/json",
+                },
+              }
+            );
+            const result = response.data;
+            if (response.status === 200 && result.status === "Successful") {
+              const { bank_name, account_number, bank_paybill, approver_name, approver_email, approver_phone } = result.data;
+              setBillingFormData({
+                bankName: bank_name || "",
+                bankAccount: account_number || "",
+                mpesaNumber: bank_paybill || "",
+                approverName: approver_name || "",
+                approverEmail: approver_email || "",
+                approverContact: approver_phone || "",
+              });
+            } else {
+              console.error("Failed to fetch billing details:", result.message);
+            }
+          } catch (error) {
+            console.error("Error fetching billing details:", error);
+          }
+        };
+    
+        fetchBillingDetails();
+      }, [token]);
+    
     
       // Analytics
       useEffect(() => {
@@ -212,44 +251,67 @@ const DashboardCards = () => {
 
           <div className='flex justify-end'>
           <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">Withdraw</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Cash Withdrawals to Mpesa</DialogTitle>
-                <DialogDescription>
-                  Withdrawal request will be sent to Approver: No approver registered, <span className='text-blue-500 underline'>Register</span>
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="amount" className="text-right">
-                    Amount(KES)
-                  </Label>
-                  <Input id="amount"
-                        placeholder="Enter amount"
-                        className="col-span-3"
-                        value={withdrawAmount}
-                        onChange={(e) => setWithdrawAmount(e.target.value)} />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="phone" className="text-right">
-                    Phone No:
+                <DialogTrigger asChild>
+                  <Button variant="outline">Withdraw</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[580px]">
+                  <DialogHeader>
+                    <DialogTitle>Cash Withdrawals to Mpesa</DialogTitle>
+                    <DialogDescription>
+                      Withdrawal request will be sent to Approver: No approver registered, <span className='text-blue-500 underline'><Link href="/account">Register</Link></span>
+
+                      <p className='mt-3 text-gray-800 font-medium'>
+                        NB: Automatic funds transfer from the wallet to your Bank Account, will take place at the last day of the month. 
+                        <span className='text-blue-500'> A monthly service fee of KES 150/= is deductible from wallet</span>
+                        </p>
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="amount" className="text-right">Amount (KES)</Label>
+                      <Input 
+                      id="amount" placeholder="Enter amount" className="col-span-3" value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="phone" className="text-right">Phone No:</Label>
+                      <Input id="phone" placeholder="Enter number" className="col-span-3" value={billingFormData.approverContact} onChange={(e) => setPhone(e.target.value)} />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="paybill" className="text-right">Paybill:</Label>
+                      <Input id="paybill" placeholder="Enter number" className="col-span-3" value={billingFormData.mpesaNumber} />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="account" className="text-right">Account No:</Label>
+                      <Input id="account" placeholder="Enter number" className="col-span-3" value={billingFormData.bankAccount} />
+                    </div>
+
+                    <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="serial" className="text-right">
+                    Device serial:
                   </Label>
                   <Input
-                        id="phone"
-                        placeholder="Enter number"
+                        id="serial"
+                        placeholder="Enter serial"
                         className="col-span-3"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        
                       />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button className="bg-blue-500 text-white" type="submit" onClick={handleWithdraw}>Submit</Button>
-              </DialogFooter>
-            </DialogContent>
+                    </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="remarks" className="text-right">
+                      Remarks:
+                    </Label>
+                    <Input
+                          id="remarks"
+                          placeholder="Enter remarks"
+                          className="col-span-3"
+                          
+                        />
+                  </div>
+                  </div>
+                  <DialogFooter>
+                    <Button className="bg-blue-500 text-white" type="submit" onClick={handleWithdraw}>Initiate Request</Button>
+                  </DialogFooter>
+                </DialogContent>
           </Dialog>
           </div>
         </Card>

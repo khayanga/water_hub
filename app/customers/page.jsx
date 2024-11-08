@@ -179,11 +179,6 @@ const Page = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // if (formData.password !== formData.confirmPassword) {
-    //   setFormError("Passwords do not match.");
-    //   return;
-    // }
-
     const newCustomer = {
       name: formData.name,
       phone: formData.phone,
@@ -221,8 +216,7 @@ const Page = () => {
         setFormData({
           name: "",
           phone: "",
-          // password: "",
-          // confirmPassword: "",
+          
           
         });
         setFormError("");

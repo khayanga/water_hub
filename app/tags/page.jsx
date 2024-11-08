@@ -64,6 +64,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Useravatar from "@/components/Useravatar";
 import { getAccessToken } from "@/components/utils/auth";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Page = () => {
   const [formData, setFormData] = useState({
@@ -74,12 +75,44 @@ const Page = () => {
   });
 
   const [tags, setTags] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const token = getAccessToken();
   const [selectedTag, setSelectedTag] = useState(null);
-  const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [formError, setFormError] = useState("");
   const [editTag, setEditTag] = useState(null);
-//
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const response = await fetch(
+          "https://api.waterhub.africa/api/v1/client/customer/list",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched data:", data);
+          setCustomers(data.data || []);
+        } else {
+          console.error("Error response:", response);
+          setFormError("Failed to fetch customers");
+        }
+      } catch (error) {
+        console.error("Error fetching customers:", error);
+        setFormError("An error occurred while fetching customers.");
+      }
+    };
+
+    fetchCustomers();
+  }, [token]);
+
+
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -160,9 +193,9 @@ const Page = () => {
               <DropdownMenuItem onClick={() => openDialog(row.original)}>
                 View
               </DropdownMenuItem>
-              {/* <DropdownMenuItem onClick={() => openEditDialog(row.original)}>
-                Edit
-              </DropdownMenuItem> */}
+              <DropdownMenuItem onClick={() => openEditDialog(row.original)}>
+                Allocate
+              </DropdownMenuItem>
               
               <DropdownMenuItem onClick={() => handleDelete(row.original.id, row.index)}>
                 Delete
@@ -266,17 +299,55 @@ const Page = () => {
     setEditTag(null);
   };
 
-  const saveChanges = () => {
-    setTags((prevTags) =>
-      prevTags.map((tag) =>
-        tag.serial === editTag.serial ? { ...editTag } : tag
-      )
-    );
-    closeEditDialog();
+  const saveChanges = async () => {
+    if (!editTag) return;
+  
+    try {
+      const response = await fetch(
+        `https://api.waterhub.africa/api/v1/client/tag/allocate/customer/${editTag.id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            customer: editTag.client,
+          }),
+        }
+      );
+  
+      if (response.ok) {
+        const { data } = await response.json();
+  
+        
+        setTags((prevTags) =>
+          prevTags.map((tag) =>
+            tag.id === editTag.id
+              ? {
+                  ...tag,
+                  tag_id: data.tag_id,
+                  token_balance: data.token_balance,
+                  client: data.customer.customer_name,
+                  device: data.device,
+                }
+              : tag
+          )
+        );
+  
+        toast({
+          description: "Tag has been allocated successfully.",
+        });
+        closeEditDialog();
+      } else {
+        console.error("Failed to allocate customer:", await response.json());
+      }
+    } catch (error) {
+      console.error("Error updating customer allocation:", error);
+    }
   };
   
-
-  
+ 
 
   return (
     <div className="flex min-h-screen w-full flex-col">
@@ -451,82 +522,46 @@ const Page = () => {
         
 
       {/* Edit Tag Dialog */}
+      
       <Dialog open={Boolean(editTag)} onOpenChange={closeEditDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Tag</DialogTitle>
+            <DialogTitle>Allocate Tag</DialogTitle>
           </DialogHeader>
+
           <div className="space-y-2">
-            <div className="space-y-1">
-              <Label htmlFor="serial">Tag Serial</Label>
-              <Input
-                id="serial"
-                type="text"
-                value={editTag?.serial}
-                onChange={handleEditChange}
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="client">Customer Assigned</Label>
-              <Select
-                id="client"
-                value={editTag?.client}
-                onValueChange={(value) =>
-                  setEditTag((prev) => ({ ...prev, client: value }))
+            <Label htmlFor="client">Customer Assigned</Label>
+            <Select
+              id="client"
+              value={editTag?.client?.id || ""}
+              onValueChange={(customerId) => {
+                const selectedCustomer = customers.find((customer) => customer.id === customerId);
+                if (selectedCustomer) {
+                  setEditTag((prev) => ({ ...prev, client: selectedCustomer }));
                 }
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select customer" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Customer 1">Customer 1</SelectItem>
-                  <SelectItem value="Customer 2">Customer 2</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="site">Water ATM Assigned</Label>
-              <Select
-                id="site"
-                value={editTag?.site}
-                onValueChange={(value) =>
-                  setEditTag((prev) => ({ ...prev, site: value }))
-                }
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select site" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ATM 1">ATM 1</SelectItem>
-                  <SelectItem value="ATM 2">ATM 2</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="status">Tag Status</Label>
-              <Select
-                id="status"
-                value={editTag?.status}
-                onValueChange={(value) =>
-                  setEditTag((prev) => ({ ...prev, status: value }))
-                }
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Inactive">Inactive</SelectItem>
-                  <SelectItem value="Suspended">Suspended</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select customer" />
+              </SelectTrigger>
+              <SelectContent className="max-h-min">
+                <ScrollArea className="h-72 rounded-md border">
+                  {customers.map((customer) => (
+                    <SelectItem key={customer.id} value={customer.id}>
+                      {customer.name}
+                    </SelectItem>
+                  ))}
+                </ScrollArea>
+              </SelectContent>
+            </Select>
           </div>
+
           <Button onClick={saveChanges} className="mt-4 bg-blue-500 text-white">
             Save Changes
           </Button>
         </DialogContent>
       </Dialog>
+
 
         </main>
      
