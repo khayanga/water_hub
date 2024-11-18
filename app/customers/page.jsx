@@ -287,9 +287,7 @@ const Page = () => {
           ...prev,
           [id]: value,
         }));
-        toast({
-          description: "Customer has been edited successfully.",
-        });
+        
       };
     
       
@@ -317,13 +315,15 @@ const Page = () => {
           if (response.ok) {
             const updatedCustomer = await response.json();
             
-            // Update the customers list with the newly updated customer
+            
             setCustomers((prevCustomers) =>
               prevCustomers.map((customer) =>
                 customer.id === editCustomer.id ? { ...customer, ...editCustomer } : customer
               )
             );
-            
+            toast({
+              description: "Customer has been edited successfully.",
+            });
             console.log("Customer updated successfully");
             closeEditDialog();
           } else {

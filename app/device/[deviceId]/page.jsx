@@ -56,7 +56,7 @@ const Page = ({params}) => {
   });
 
   const token = getAccessToken();
-
+// Fetching device information
   useEffect(() => {
     if (deviceId) {
       const fetchDevice = async () => {
@@ -144,9 +144,16 @@ const Page = ({params}) => {
       const result = await response.json();
       if (response.ok) {
         
-        alert("Tap settings updated successfully")
+        // alert("Tap settings updated successfully")
+        toast({
+          description: "Tap settings updated successfully.",
+        });
         console.log('Updated tap settings:', result);
       } else {
+        toast({
+          variant:"destructive",
+          description: "Failed to update, try again .",
+        });
         setError('Failed to update tap settings');
         console.error('API Error:', result);
       }
@@ -173,9 +180,16 @@ const Page = ({params}) => {
 
       const result = await response.json();
       if (response.ok) {
-        alert("Tap calibration updated successfully");
+        // alert("Tap calibration updated successfully");
+        toast({
+          description: "Tap calibration updated successfully.",
+        });
         console.log('Updated tap calibration:', result);
       } else {
+        toast({
+          variant:"destructive",
+          description: "Failed to update, try again .",
+        });
         setError('Failed to update tap calibration');
       }
     } catch (error) {
@@ -198,10 +212,17 @@ const Page = ({params}) => {
 
     const result = await response.json();
     if (response.ok) {
-      alert('API Keys added successfully');
+      // alert('API Keys added successfully');
+      toast({
+        description: "API Keys added successfully.",
+      });
       console.log('API keys response:', result);
     } else {
-      alert('Failed to add API keys');
+      // alert('Failed to add API keys');
+      toast({
+        variant:"destructive",
+        description: "Failed to add API keys .",
+      });
       console.error('API error:', result);
     }
   } catch (error) {

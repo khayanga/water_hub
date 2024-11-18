@@ -38,11 +38,14 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -523,8 +526,11 @@ const Page = () => {
 
       {/* Edit Tag Dialog */}
       
+
+    
+      
       <Dialog open={Boolean(editTag)} onOpenChange={closeEditDialog}>
-        <DialogContent>
+        <DialogContent className=" max-h-[500px] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Allocate Tag</DialogTitle>
           </DialogHeader>
@@ -544,8 +550,8 @@ const Page = () => {
               <SelectTrigger>
                 <SelectValue placeholder="Select customer" />
               </SelectTrigger>
-              <SelectContent className="max-h-min">
-                <ScrollArea className="h-72 rounded-md border">
+              <SelectContent >
+                <ScrollArea className="h-72 rounded-md border z-10">
                   {customers.map((customer) => (
                     <SelectItem key={customer.id} value={customer.id}>
                       {customer.name}

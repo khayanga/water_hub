@@ -1,7 +1,7 @@
 "use client";
 
 import { TrendingUp } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import {
   Card,
@@ -39,22 +39,20 @@ const chartConfig = {
 };
 
 // Function to transform API data into chart data
-const transformData = (deviceData) => {
+const transformData = ({ mpesa_transactions, tag_topup_transactions, tag_pay_transactions }) => {
   const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "June",
-    "July", "Aug", "Sep", "Oct", "Nov", "Dec"
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
 
-  return months.map((_, index) => {
-    const monthIndex = (index + 1).toString(); 
-    return {
-      month: months[index],
-      mpesa: Math.max(0, deviceData.mpesa_transactions[monthIndex] ?? 0),  
-      topup: Math.max(0, deviceData.tag_topup_transactions[monthIndex] ?? 0),  
-      tagpay: Math.max(0, deviceData.tag_pay_transactions[monthIndex] ?? 0),  
-    };
-  });
+  return months.map((month, index) => ({
+    month,
+    mpesa: Math.max(0, mpesa_transactions[index + 1] ?? 0),
+    topup: Math.max(0, tag_topup_transactions[index + 1] ?? 0),
+    tagpay: Math.max(0, tag_pay_transactions[index + 1] ?? 0),
+  }));
 };
+
 
 
 const Clientchart = () => {
@@ -73,7 +71,7 @@ const Clientchart = () => {
             },
           });
           const data = await response.json();
-          console.log("Fetched Data:", data); // Log the fetched data
+          console.log("Fetched Data:", data); 
           if (data && data.device_data && data.device_data.length > 0) {
             const transformedData = transformData(data.device_data[0]);
             console.log("Transformed data:", transformedData);
@@ -101,51 +99,26 @@ const Clientchart = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-         <ChartContainer config={chartConfig}>
-          <AreaChart
-            data={chartData}
-             margin={{
-              left: 12,
-              right: 12,
-            }}
-            
-          >
+      <ChartContainer config={chartConfig}>
+          <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="month"
               tickLine={false}
+              tickMargin={10}
               axisLine={false}
-              tickMargin={8}
               tickFormatter={(value) => value.slice(0, 3)}
             />
-            
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="dot" />}
             />
-            <Area
-              dataKey="mpesa"
-              fill="var(--color-mpesa)"
-              fillOpacity={0.4}
-              stroke="var(--color-mpesa)"
-              stackId="a"
-            />
-            <Area
-              dataKey="topup"
-              fill="var(--color-topup)"
-              fillOpacity={0.4}
-              stroke="var(--color-topup)"
-              stackId="a"
-            />
-            <Area
-              dataKey="tagpay"
-              fill="var(--color-tagpay)"
-              fillOpacity={0.4}
-              stroke="var(--color-tagpay)"
-              stackId="a"
-            />
-          </AreaChart>
+            <Bar dataKey="mpesa" fill="var(--color-mpesa)"radius={4} />
+            <Bar dataKey="topup" fill="var(--color-topup)" radius={4} />
+            <Bar dataKey="tagpay" fill="var(--color-tagpay)" radius={4} />
+          </BarChart>
         </ChartContainer>
+        
       </CardContent>
       <CardFooter>
         <div className="flex w-full items-start gap-2 text-sm">
@@ -164,3 +137,7 @@ const Clientchart = () => {
 }
 
 export default Clientchart
+
+
+
+

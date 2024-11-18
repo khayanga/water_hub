@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -8,34 +8,27 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); 
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    
-    setMounted(true);
+    const userData = sessionStorage.getItem("user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+    setLoading(false);
   }, []);
 
   useEffect(() => {
-    if (mounted) {
-      const userData = sessionStorage.getItem("user");
-      if (userData) {
-        setUser(JSON.parse(userData));
-      } else {
-        
-        try {
-          router.push("/sign-in");
-        } catch (error) {
-          console.error("Failed to redirect to sign-in:", error);
-        }
-      }
+    if (!loading && !user && router.asPath !== "/sign-in") {
+      router.push("/sign-in");
     }
-  }, [mounted, router]);
+  }, [user, loading, router]);
 
   const login = (userData) => {
     setUser(userData);
     sessionStorage.setItem("user", JSON.stringify(userData));
-    router.push("/dashboard");
+    router.push("/client-dashboard");
   };
 
   const logout = () => {
@@ -44,8 +37,8 @@ export const AuthProvider = ({ children }) => {
     router.push("/sign-in");
   };
 
-  if (!mounted) {
-    return  <Spinner/>
+  if (loading) {
+    return <Spinner />;
   }
 
   return (
@@ -56,5 +49,7 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
+
 
 

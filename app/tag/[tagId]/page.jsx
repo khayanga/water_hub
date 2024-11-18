@@ -80,8 +80,15 @@ const Page = ({params}) => {
       });
 
       if (response.ok) {
-        alert('Token assigned successfully');
+        // alert('Token assigned successfully');
+        toast({
+          description: "Token assigned successfully.",
+        });
       } else {
+        toast({
+          variant:"destructive",
+          description: "Failed to assign token.",
+        });
         setError('Failed to assign token');
       }
     } catch (error) {
