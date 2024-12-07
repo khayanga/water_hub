@@ -24,7 +24,8 @@ import Useravatar from "@/components/Useravatar";
 import { getAccessToken } from "@/components/utils/auth";
 import { useRouter } from "next/router";
 
-const Page = ({params}) => {
+export default async function Page({ params }) {
+
     const [amount, setAmount] = useState('');
   const { tagId } = params;
   const [tagData, settagData] = useState(null);
@@ -180,4 +181,3 @@ const Page = ({params}) => {
   );
 };
 
-export default Page;

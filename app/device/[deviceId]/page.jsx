@@ -24,9 +24,12 @@ import Useravatar from "@/components/Useravatar";
 import { getAccessToken } from "@/components/utils/auth";
 import { useRouter } from "next/router";
 
-const Page = ({params}) => {
-   
+export default async function Page({ params }) {
+
+  
+ 
   const { deviceId } = params;
+
   const [deviceData, setDeviceData] = useState(null);
   const [error, setError] = useState('');
   const [accountType, setAccountType] = useState('');
@@ -276,7 +279,7 @@ const Page = ({params}) => {
           
           {/* Tap settings */}
 
-          <form onSubmit={handleSubmitSettings} className="w-full mt-5 pl-2">
+          <form onSubmit={handleSubmitSettings} className="w-full md:max-w-2xl mt-5 pl-2">
             <TabsContent value="tap-settings">
               <Card>
                 <CardContent className="space-y-2">
@@ -337,7 +340,7 @@ const Page = ({params}) => {
 
           {/* Tap callibration */}
          
-           <form onSubmit={handleSubmitCalibration} className="w-full mt-5 pl-2">
+           <form onSubmit={handleSubmitCalibration} className="w-full md:max-w-2xl mt-5 pl-2">
             <TabsContent value="tap-callibration">
               <Card>
                 <CardContent className="space-y-2">
@@ -556,4 +559,3 @@ const Page = ({params}) => {
   );
 };
 
-export default Page;

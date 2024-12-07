@@ -173,13 +173,13 @@ const Page = () => {
               <DropdownMenuItem onClick={() => openDialog(row.original)}>
                 View
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => openEditDialog(row.original)}>
+              {/* <DropdownMenuItem onClick={() => openEditDialog(row.original)}>
                 Edit
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               
-              <DropdownMenuItem onClick={() => handleDelete(row.original.id, row.index)}>
+              {/* <DropdownMenuItem onClick={() => handleDelete(row.original.id, row.index)}>
                 Delete
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
         );

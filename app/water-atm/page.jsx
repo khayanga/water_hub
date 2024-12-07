@@ -257,6 +257,9 @@ const Page = () => {
     window.location.href = `/device/${device.id}`;
   };
 
+
+ 
+
   const closeDialog = () => {
     setSelectedDevice(null);
   };
