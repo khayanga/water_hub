@@ -127,7 +127,7 @@ const Clientchart = () => {
               Trends in months <TrendingUp className="h-4 w-4" />
             </div>
             <div className="flex items-center gap-2 leading-none text-muted-foreground">
-              January - December 2024
+              January - December {new Date().getFullYear()}
             </div>
           </div>
         </div>
