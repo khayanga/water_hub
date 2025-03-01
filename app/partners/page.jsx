@@ -121,25 +121,25 @@ const Page = () => {
     });
   };
 
-  const sortData = (key) => {
-    let direction = "ascending";
-    if (sortConfig.key === key && sortConfig.direction === "ascending") {
-      direction = "descending";
-    }
+  // const sortData = (key) => {
+  //   let direction = "ascending";
+  //   if (sortConfig.key === key && sortConfig.direction === "ascending") {
+  //     direction = "descending";
+  //   }
 
-    const sortedPartners = [...partners].sort((a, b) => {
-      if (a[key] < b[key]) {
-        return direction === "ascending" ? -1 : 1;
-      }
-      if (a[key] > b[key]) {
-        return direction === "ascending" ? 1 : -1;
-      }
-      return 0;
-    });
+  //   const sortedPartners = [...partners].sort((a, b) => {
+  //     if (a[key] < b[key]) {
+  //       return direction === "ascending" ? -1 : 1;
+  //     }
+  //     if (a[key] > b[key]) {
+  //       return direction === "ascending" ? 1 : -1;
+  //     }
+  //     return 0;
+  //   });
 
-    setSortConfig({ key, direction });
-    setPartners(sortedPartners);
-  };
+  //   setSortConfig({ key, direction });
+  //   setPartners(sortedPartners);
+  // };
 
   const openDialog = (partner) => {
     setSelectedPartner(partner);
