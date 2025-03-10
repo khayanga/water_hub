@@ -13,9 +13,7 @@ import {
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
+  
   SheetTrigger,
 } from "@/components/ui/sheet"
 
@@ -29,7 +27,8 @@ import { navItems } from '@/data';
 const Useravatar = () => {
   const [userName, setUserName] = useState('');
   const [userInitial, setUserInitial] = useState('');
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+ 
 
   useEffect(() => {
     const user = JSON.parse(sessionStorage.getItem('user'));
@@ -142,26 +141,20 @@ const Useravatar = () => {
           </DropdownMenuContent>
           </DropdownMenu>
 
-          <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="icon">
-            <SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+         
+
+          <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          {theme === "dark" ? (
             <MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setTheme("light")}>
-            Light
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme("dark")}>
-            Dark
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme("system")}>
-            System
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-          </DropdownMenu>
+          ) : (
+            <SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          )}
+          <span className="sr-only">Toggle theme</span>
+        </Button>
 
          
 
