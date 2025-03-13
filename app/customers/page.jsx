@@ -48,18 +48,36 @@ import { Input } from "@/components/ui/input";
 import Useravatar from "@/components/Useravatar";
 import { getAccessToken } from "@/components/utils/auth";
 import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+
 
 const Page = () => {
+  
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    // password: "",
-    // confirmPassword: "",
-    
+    extraFields: [],
   });
-  
-  
+
+  const [availableFields, setAvailableFields] = useState([
+    "Email",
+    "Address",
+    "Age",
+    "City",
+    "Country",
+    "Postal Code",
+    "Company",
+    "Job Title",
+    // Add more fields as needed
+  ]);
+  const [selectedField, setSelectedField] = useState("");
   const [customers, setCustomers] = useState([]);
   const [formError, setFormError] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -86,7 +104,6 @@ const Page = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched data:", data);
           setCustomers(data.data || []);
         } else {
           console.error("Error response:", response);
@@ -166,75 +183,7 @@ const Page = () => {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
-  };
-
   
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const newCustomer = {
-      name: formData.name,
-      phone: formData.phone,
-    };
-
-    try {
-      const response = await fetch(
-        "https://api.waterhub.africa/api/v1/client/customer/store",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(newCustomer),
-        }
-      );
-
-      const data = await response.json();
-      
-      console.log("List of customers", data);
-
-      if (response.ok) {
-       
-
-        const addedCustomer = data.data; 
-      
-        setCustomers((prevCustomers) => [addedCustomer, ...prevCustomers]);
-
-        toast({
-          title: "Customer added successfully!",
-          description: `Customer ${formData.name} was added.`,
-        });
-
-        setFormData({
-          name: "",
-          phone: "",
-          
-          
-        });
-        setFormError("");
-      } else {
-        setFormError(data.message || "Failed to add customer");
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: "There was a problem adding the customer.",
-          // action: <ToastAction altText="Try again">Try again</ToastAction>,
-        })
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      setFormError("An error occurred while adding the customer.");
-    }
-  };
-
 
 
   const handleDelete = async (customerId, index) => {
@@ -270,6 +219,74 @@ const Page = () => {
       setFormError("An error occurred while deleting the customer.");
     }
   };
+ 
+  const handleChange = (fieldName, value) => {
+    setFormData((prev) => ({ ...prev, [fieldName]: value }));
+  };
+
+  const addExtraField = (fieldName) => {
+    if (
+      !fieldName.trim() ||
+      formData.extraFields.some((field) => field.name === fieldName.trim())
+    )
+      return;
+
+    setFormData((prev) => ({
+      ...prev,
+      extraFields: [...prev.extraFields, { name: fieldName.trim(), value: "" }],
+    }));
+  };
+
+  const handleExtraFieldChange = (index, value) => {
+    setFormData((prev) => {
+      const updatedFields = [...prev.extraFields];
+      updatedFields[index].value = value;
+      return { ...prev, extraFields: updatedFields };
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const formattedData = {
+      name: formData.name,
+      phone: formData.phone,
+      ...Object.fromEntries(formData.extraFields.map((field) => [field.name, field.value])),
+    };
+  
+    try {
+      const response = await fetch("https://api.waterhub.africa/api/v1/client/customer/store", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formattedData),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        const addedCustomer = data.data; 
+      
+        setCustomers((prevCustomers) => [addedCustomer, ...prevCustomers]);
+
+        toast({
+          title: "Customer added successfully!",
+          description: `Customer ${formData.name} was added.`,
+        });
+
+        setFormData({ name: "", phone: "", extraFields: [] });
+  
+        
+      } else {
+        toast({ title: "Error", description: data.message, variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "An error occurred.", variant: "destructive" });
+    }
+  };
+  
   
 
   
@@ -365,62 +382,106 @@ const Page = () => {
           Fill in the form below to register a customer.
         </p>
 
-        <form className="w-full md:max-w-3xl mt-5 " onSubmit={handleSubmit}>
-          <Card>
-            <CardContent className="space-y-2">
-              {/* {formError && <div className="text-red-500 mb-2">{formError}</div>} */}
-              <div className="flex flex-wrap gap-8 p-2">
-                <div className="space-y-1">
-                  <Label htmlFor="name">Customer Name</Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="Enter client's name"
-                    value={formData.name}
-                    onChange={handleChange}
-                  />
-                </div>
-                
-                <div className="space-y-1">
-                  <Label htmlFor="phone">Customer Phone</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="(+254...)"
-                    value={formData.phone}
-                    onChange={handleChange}
-                  />
-                </div>
-                {/* <div className="space-y-1">
-                  <Label htmlFor="password">New Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Enter new password"
-                    value={formData.password}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="Confirm new password"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                  />
-                </div> */}
-                
+       <form onSubmit={handleSubmit} className=" mt-5">
+       
+        <Card className="w-full md:max-w-5xl">
+        
+
+          {/* Input to Add New Fields */}
+         
+          <CardContent>
+          <div className="flex flex-wrap items-center gap-8 py-2">
+            <div className="space-y-1">
+                    <Label htmlFor="name">Customer Name</Label>
+                    <Input
+                      type="text"
+                      placeholder="Name"
+                      value={formData.name}
+                      onChange={(e) => handleChange("name", e.target.value)}
+                      required
+                    />
+                    
+          </div>
+          <div className="space-y-1">
+              <Label htmlFor="phone">Customer Phone</Label>
+              <Input
+              type="text"
+              placeholder="Phone"
+              value={formData.phone}
+              onChange={(e) => handleChange("phone", e.target.value)}
+              required
+            />
+
+            </div>
+
+             {/* Dynamic Extra Fields */}
+            {formData.extraFields.map((field, index) => (
+              <div key={index} className="space-y-1">
+                <Label htmlFor={field.name}>{field.name}</Label>
+                <Input
+                type={field.name.toLowerCase() === "password" ? "password" : "text"}
+                placeholder={field.name}
+                value={field.value}
+                onChange={(e) => handleExtraFieldChange(index, e.target.value)}
+              />
               </div>
-            </CardContent>
-            <CardFooter>
+              
+            ))}
+            <div className="flex items-center space-x-2 md:space-x-4 mt-5   justify-start">
+          <Button
+                type="button"
+                className="bg-blue-500 text-white px-4 py-2"
+                onClick={() => {
+                  addExtraField(selectedField);
+                  setSelectedField("");
+                }}
+              >
+                Add Field
+            </Button>
+            <Select
+        value={selectedField}
+        onValueChange={(value) => setSelectedField(value)} // Corrected onChange
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Select Field" />
+        </SelectTrigger>
+        <SelectContent>
+          {availableFields.map((field) => (
+            <SelectItem key={field} value={field}>
+              {field}
+            </SelectItem>
+          ))}
+        </SelectContent>
+            </Select>
+
+            
+              
+            </div>
+        
+
+
+          </div>
+
+          </CardContent>
+
+          <CardFooter>
               <Button type="submit" className="bg-blue-500 text-white">
-                Add customer
+                Submit
               </Button>
             </CardFooter>
-          </Card>
-        </form>
+          
+            
+      
+
+        </Card>
+       
+      
+     
+     
+      </form>
+
+
+        
 
         <div className="flex flex-row items-center justify-between gap-6  mt-8">
           <h1 className="font-bold tracking-wide mb-2">Customers List</h1>
@@ -559,3 +620,18 @@ const Page = () => {
 
 export default Page;
 
+
+{/* <form  " onSubmit={handleSubmit}>
+          <Card>
+            <CardContent >
+              
+              <div className="flex flex-wrap gap-8 p-2">
+                
+                
+                
+                
+              </div>
+            </CardContent>
+            
+          </Card>
+        </form> */}

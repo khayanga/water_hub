@@ -91,7 +91,7 @@ const Clientchart = () => {
       
 
   return (
-    <Card>
+    <Card >
       <CardHeader>
         <CardTitle>Revenue Analytics</CardTitle>
         <CardDescription>
