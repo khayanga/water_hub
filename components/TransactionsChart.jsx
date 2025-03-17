@@ -96,7 +96,7 @@ export function TransactionsChart() {
   );
 
   return (
-    <Card className="flex flex-col w-full md:w-1/2 mx-auto mb-4 ">
+    <Card className="flex flex-col w-1/2 mx-auto mb-4 ">
       <CardHeader className="items-center pb-0">
         <CardTitle>Tranasactions Statistics</CardTitle>
         <CardDescription>
