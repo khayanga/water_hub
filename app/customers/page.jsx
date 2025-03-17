@@ -428,16 +428,7 @@ const Page = () => {
               
             ))}
             <div className="flex items-center space-x-2 md:space-x-4 mt-5   justify-start">
-          <Button
-                type="button"
-                className="bg-blue-500 text-white px-4 py-2"
-                onClick={() => {
-                  addExtraField(selectedField);
-                  setSelectedField("");
-                }}
-              >
-                Add Field
-            </Button>
+          
             <Select
         value={selectedField}
         onValueChange={(value) => setSelectedField(value)} // Corrected onChange
@@ -453,6 +444,16 @@ const Page = () => {
           ))}
         </SelectContent>
             </Select>
+            <Button
+                type="button"
+                className="bg-blue-500 text-white px-4 py-2"
+                onClick={() => {
+                  addExtraField(selectedField);
+                  setSelectedField("");
+                }}
+              >
+                Add Field
+            </Button>
 
             
               
