@@ -56,7 +56,6 @@ const DashboardTable = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched data:", data);
           setCustomers(data.data || []);
         } else {
           console.error("Error response:", response);

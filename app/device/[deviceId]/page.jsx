@@ -69,6 +69,7 @@ export default  function Page() {
         if (response.ok) {
           const data = await response.json();
           setDeviceData(data.device);
+         
         } else {
           setError("Failed to fetch device details");
         }

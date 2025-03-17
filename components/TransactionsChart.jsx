@@ -54,7 +54,7 @@ export function TransactionsChart() {
         );
 
         const data = await response.json();
-        console.log("Fetched Data:", data);
+        // console.log("Fetched Data:", data);
 
         if (data?.device_data?.length > 0) {
           const rawData = data.device_data[0];
@@ -78,7 +78,7 @@ export function TransactionsChart() {
             },
           ];
 
-          console.log("Filtered Data:", filteredData);
+        //   console.log("Filtered Data:", filteredData);
           setChartData(filteredData);
         }
       } catch (error) {
@@ -96,7 +96,7 @@ export function TransactionsChart() {
   );
 
   return (
-    <Card className="flex flex-col w-1/2 mx-auto mb-4 ">
+    <Card className="flex flex-col w-full md:w-1/2 mx-auto mb-4 ">
       <CardHeader className="items-center pb-0">
         <CardTitle>Tranasactions Statistics</CardTitle>
         <CardDescription>

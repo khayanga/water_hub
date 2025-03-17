@@ -94,6 +94,8 @@ const Mpesa = () => {
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
       });
+
+      
   return (
      <div className="w-full mt-2">
                 <Card >

@@ -68,6 +68,7 @@ import { Input } from "@/components/ui/input";
 import Useravatar from "@/components/Useravatar";
 import { getAccessToken } from "@/components/utils/auth";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/hooks/use-toast";
 
 const Page = () => {
   const [formData, setFormData] = useState({
@@ -77,12 +78,26 @@ const Page = () => {
     status: "",
   });
 
+  const {toast}= useToast()
+
+ 
+  const [showRegisterDialog, setShowRegisterDialog] = useState(false);
+
   const [tags, setTags] = useState([]);
   const [customers, setCustomers] = useState([]);
   const token = getAccessToken();
   const [selectedTag, setSelectedTag] = useState(null);
   const [formError, setFormError] = useState("");
   const [editTag, setEditTag] = useState(null);
+
+  const [customerData, setCustomerData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+  
+ 
+  
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -115,7 +130,54 @@ const Page = () => {
     fetchCustomers();
   }, [token]);
 
-
+  const handleRegisterCustomer = async (e) => {
+    e.preventDefault();
+  
+    const formattedData = {
+      name: customerData.name,
+      email: customerData.email,
+      phone: customerData.phone,
+    };
+  
+    try {
+      const response = await fetch("https://api.waterhub.africa/api/v1/client/customer/store", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formattedData),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        const addedCustomer = data.data;
+  
+        setCustomers((prevCustomers) => [addedCustomer, ...prevCustomers]);
+  
+        toast({
+          title: "Customer registered successfully!",
+          description: `Customer ${customerData.name} was added.`,
+        });
+  
+        setCustomerData({ name: "", email: "", phone: "" });
+        setShowRegisterDialog(false); // Close the dialog after successful registration
+      } else {
+        toast({ title: "Error", description: data.message, variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "An error occurred.", variant: "destructive" });
+    }
+  };
+  
+  const handleChangeCustomer = (e) => {
+    const { id, value } = e.target;
+    setCustomerData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -134,7 +196,7 @@ const Page = () => {
           const tagsData = data.data.flatMap((device) => device.tags);
           setTags(tagsData);
           setTotalPages(data.total_pages); 
-          console.log("Fetched Tags:", tagsData); 
+          // console.log("Fetched Tags:", tagsData); 
         }
       } catch (error) {
         console.error("Error fetching tags:", error);
@@ -262,7 +324,10 @@ const Page = () => {
       );
   
       if (response.ok) {
-       console.log("Tag deleted successfully")
+        toast({
+          variant: "destructive",
+          description: "Tag deleted succesfully.",
+        });
        setTags((prevTags) => prevTags.filter((_, i) => i !== index));
       } else {
         
@@ -371,7 +436,7 @@ const Page = () => {
           The table below shows a list of all registered tags.
         </p>
 
-        <form className="w-full mt-5  hidden" onSubmit={handleSubmit}>
+        {/* <form className="w-full mt-5  hidden" onSubmit={handleSubmit}>
           <Card>
             <CardContent className="space-y-2">
               {formError && (
@@ -452,7 +517,7 @@ const Page = () => {
               </Button>
             </CardFooter>
           </Card>
-        </form>
+        </form> */}
         <div className="flex flex-row items-center justify-between gap-6 mt-8">
           <h1 className="font-bold tracking-wide mb-2">Registered Tags</h1>
         </div>
@@ -487,7 +552,7 @@ const Page = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="text-center">
-                  No sites found.
+                  No tags found.
                 </TableCell>
               </TableRow>
             )}
@@ -529,7 +594,7 @@ const Page = () => {
 
     
       
-      <Dialog open={Boolean(editTag)} onOpenChange={closeEditDialog}>
+      {/* <Dialog open={Boolean(editTag)} onOpenChange={closeEditDialog}>
         <DialogContent className=" max-h-[500px] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Allocate Tag</DialogTitle>
@@ -547,17 +612,19 @@ const Page = () => {
                 }
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger >
                 <SelectValue placeholder="Select customer" />
               </SelectTrigger>
-              <SelectContent >
-                <ScrollArea className="h-72 rounded-md border z-10">
+              <SelectContent className="max-h-[180px] " >
+                <SelectGroup>
+                  
                   {customers.map((customer) => (
                     <SelectItem key={customer.id} value={customer.id}>
                       {customer.name}
                     </SelectItem>
                   ))}
-                </ScrollArea>
+
+                </SelectGroup>
               </SelectContent>
             </Select>
           </div>
@@ -566,7 +633,85 @@ const Page = () => {
             Save Changes
           </Button>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
+
+
+        <Dialog open={Boolean(editTag)} onOpenChange={closeEditDialog}>
+          <DialogContent className="max-h-[500px] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Allocate Tag</DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-2">
+              <Label htmlFor="client">Customer Assigned</Label>
+              <Select
+                id="client"
+                value={editTag?.client?.id || ""}
+                onValueChange={(customerId) => {
+                  const selectedCustomer = customers.find((customer) => customer.id === customerId);
+                  if (selectedCustomer) {
+                    setEditTag((prev) => ({ ...prev, client: selectedCustomer }));
+                  }
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select customer" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[180px] overflow-y-auto">
+                  <SelectGroup>
+                    {customers.length > 0 ? (
+                      customers.map((customer) => (
+                        <SelectItem key={customer.id} value={customer.id}>
+                          {customer.name}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <div className="p-2 text-center">
+                        <p className="text-sm text-gray-500">No customers found</p>
+                        <Button
+                          
+                          className="mt-2 text-white w-full"
+                          onClick={() => setShowRegisterDialog(true)}
+                        >
+                          Register New Customer
+                        </Button>
+                      </div>
+                    )}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button onClick={saveChanges} className="mt-4 bg-blue-500 text-white">
+              Save Changes
+            </Button>
+          </DialogContent>
+        </Dialog>
+
+        {/* Customer Registration Dialog */}
+        <Dialog open={showRegisterDialog} onOpenChange={setShowRegisterDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle >Register New Customer</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleRegisterCustomer}>
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input id="name" type="text" required value={customerData.name} onChange={handleChangeCustomer} />
+
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" required value={customerData.email} onChange={handleChangeCustomer} />
+
+                <Label htmlFor="phone">Phone</Label>
+                <Input id="phone" type="tel" required value={customerData.phone} onChange={handleChangeCustomer} />
+              </div>
+
+              <Button type="submit" className="mt-4 bg-blue-500 text-white w-full">
+                Register
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
 
 
         </main>

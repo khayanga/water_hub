@@ -31,7 +31,7 @@ const Withdrawals = () => {
           const data = await response.json();
           if (data && data.data) {
             setWithdrawTransactions(data.data);
-            console.log(data.data)  
+             
           } else {
             console.error("Unexpected response structure", data);
           }

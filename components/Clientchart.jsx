@@ -74,7 +74,7 @@ const Clientchart = () => {
           console.log("Fetched Data:", data); 
           if (data && data.device_data && data.device_data.length > 0) {
             const transformedData = transformData(data.device_data[0]);
-            console.log("Transformed data:", transformedData);
+            
             setChartData(transformedData);
           }
         } catch (error) {

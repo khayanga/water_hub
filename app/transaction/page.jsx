@@ -3,13 +3,13 @@ import React from 'react'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Sidebar from "@/components/Sidebar";
-
 import Useravatar from "@/components/Useravatar";
-
 import  { TransactionsChart } from "@/components/TransactionsChart";
 import Mpesa from "@/components/Mpesa";
 import Tag from "@/components/Tag";
 import Withdrawals from "@/components/Withdrawals";
+import { Comparison } from '@/components/Comparison';
+
 
 
 const page = () => {
@@ -21,8 +21,9 @@ const page = () => {
       <Useravatar />
 
         <main className=" px-4 py-2 sm:px-6 sm:py-0 ">
-        <div className="flex flex-row items-center gap-6">
+        <div className="flex  flex-col md:flex-row items-center justify-between gap-6">
             <h1 className="font-bold tracking-wider">Transaction Reports.</h1>
+            
           </div>
 
           <p className="mt-1 tracking-wider text-sm font-light ">
@@ -39,8 +40,13 @@ const page = () => {
             <TabsTrigger value="withdrawal">Withdrawal History</TabsTrigger>
             
           </TabsList>
-
+          <div className='flex flex-col items-center  md:flex-row  gap-8 '>
           <TransactionsChart/>
+          <Comparison/>
+
+          </div>
+
+          
           
         
 
