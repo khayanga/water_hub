@@ -360,17 +360,26 @@ const Page = () => {
   };
 
   const openEditDialog = (tag) => {
-    setEditTag(tag);
+    setEditTag({
+      ...tag,
+      client: {
+        id: tag.customer?.id,
+        name: tag.customer?.customer_name,
+      },
+    });
   };
+  
 
   const closeEditDialog = () => {
     setEditTag(null);
   };
 
   const saveChanges = async () => {
-    if (!editTag) return;
+    if (!editTag || !editTag.client?.id) return;
   
     try {
+      console.log("Allocating tag:", editTag.id, "to customer:", editTag.client.id);
+  
       const response = await fetch(
         `https://api.waterhub.africa/api/v1/client/tag/allocate/customer/${editTag.id}`,
         {
@@ -380,7 +389,7 @@ const Page = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            customer: editTag.client,
+            customer: Number(editTag.client.id),
           }),
         }
       );
@@ -388,7 +397,6 @@ const Page = () => {
       if (response.ok) {
         const { data } = await response.json();
   
-        
         setTags((prevTags) =>
           prevTags.map((tag) =>
             tag.id === editTag.id
@@ -396,24 +404,35 @@ const Page = () => {
                   ...tag,
                   tag_id: data.tag_id,
                   token_balance: data.token_balance,
-                  client: data.customer.customer_name,
+                  customer: {
+                    id: editTag.client.id,
+                    customer_name: data.customer.customer_name, 
+                  },
                   device: data.device,
                 }
               : tag
           )
         );
+        
+        
   
         toast({
           description: "Tag has been allocated successfully.",
         });
         closeEditDialog();
       } else {
-        console.error("Failed to allocate customer:", await response.json());
+        const errorData = await response.json();
+        console.error("Failed to allocate customer:", errorData);
+        toast({
+          variant: "destructive",
+          description: errorData.message || "Failed to allocate tag.",
+        });
       }
     } catch (error) {
       console.error("Error updating customer allocation:", error);
     }
   };
+  
   
  
 
@@ -590,51 +609,7 @@ const Page = () => {
         
 
       {/* Edit Tag Dialog */}
-      
-
     
-      
-      {/* <Dialog open={Boolean(editTag)} onOpenChange={closeEditDialog}>
-        <DialogContent className=" max-h-[500px] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Allocate Tag</DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-2">
-            <Label htmlFor="client">Customer Assigned</Label>
-            <Select
-              id="client"
-              value={editTag?.client?.id || ""}
-              onValueChange={(customerId) => {
-                const selectedCustomer = customers.find((customer) => customer.id === customerId);
-                if (selectedCustomer) {
-                  setEditTag((prev) => ({ ...prev, client: selectedCustomer }));
-                }
-              }}
-            >
-              <SelectTrigger >
-                <SelectValue placeholder="Select customer" />
-              </SelectTrigger>
-              <SelectContent className="max-h-[180px] " >
-                <SelectGroup>
-                  
-                  {customers.map((customer) => (
-                    <SelectItem key={customer.id} value={customer.id}>
-                      {customer.name}
-                    </SelectItem>
-                  ))}
-
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Button onClick={saveChanges} className="mt-4 bg-blue-500 text-white">
-            Save Changes
-          </Button>
-        </DialogContent>
-      </Dialog> */}
-
 
         <Dialog open={Boolean(editTag)} onOpenChange={closeEditDialog}>
           <DialogContent className="max-h-[500px] overflow-y-auto">

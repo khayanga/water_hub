@@ -10,60 +10,58 @@ import {
 
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import Sidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Useravatar from "@/components/Useravatar";
 import { getAccessToken } from "@/components/utils/auth";
-import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
-export default async function Page({ params }) {
+export default  function Page() {
 
     const [amount, setAmount] = useState('');
-  const { tagId } = params;
+
+    const {toast} = useToast();
+  
+  const { tagId } = useParams();
   const [tagData, settagData] = useState(null);
   const [error, setError] = useState('');
   const token = getAccessToken();
 
+  const fetchTagData = async () => {
+    try {
+      const response = await fetch(
+        `https://api.waterhub.africa/api/v1/client/tag/${tagId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+          },
+        }
+      );
+  
+      if (response.ok) {
+        const data = await response.json();
+        settagData(data.tag);
+      } else {
+        setError('Failed to fetch tag details');
+      }
+    } catch (error) {
+      setError('An error occurred while fetching tag details.');
+    }
+  };
+  
+  
   useEffect(() => {
     if (tagId) {
-      const fetchTag = async () => {
-        try {
-          const response = await fetch(`https://api.waterhub.africa/api/v1/client/tag/${tagId}`,
-            {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json',
-              },
-            }
-          );
-
-          if (response.ok) {
-            const data = await response.json();
-            console.log('Fetched tag data:', data);
-            settagData(data.tag);
-          } else {
-            console.error('Error response:', response);
-            setError('Failed to fetch tag details');
-          }
-        } catch (error) {
-          console.error('Error fetching tag details:', error);
-          setError('An error occurred while fetching tag details.');
-        }
-      };
-
-      fetchTag();
+      fetchTagData();
     }
   }, [tagId, token]);
+  
 
   const assignToken = async (event) => {
     event.preventDefault();
@@ -81,10 +79,13 @@ export default async function Page({ params }) {
       });
 
       if (response.ok) {
-        // alert('Token assigned successfully');
+      
         toast({
           description: "Token assigned successfully.",
         });
+
+        setAmount('');
+        fetchTagData();
       } else {
         toast({
           variant:"destructive",

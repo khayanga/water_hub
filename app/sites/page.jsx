@@ -60,6 +60,7 @@ import {
 import Useravatar from "@/components/Useravatar";
 import Timezone from "@/components/Timezone";
 import Country from "@/components/Country";
+import Map from "@/components/Map";
 import { getAccessToken } from "@/components/utils/auth";
 
 const Page = () => {
@@ -97,7 +98,7 @@ const Page = () => {
   
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched data :", data);
+          // console.log("Fetched data :", data);
   
          
           setSites(data[0] || []); 
@@ -319,10 +320,14 @@ const Page = () => {
             </Button>
           </div>
 
-          <p className="mt-2 tracking-wider text-sm font-light pl-2 ">
-          The table below has a list of all the sites.
+          <p className="mt-1 tracking-wider text-sm font-light pl-2  mb-4">
+          The map below show the site locations.
           </p>
 
+
+         
+          <Map/>
+          
 
         <form className="w-full mt-5  hidden " onSubmit={handleSubmit}>
           <Card>

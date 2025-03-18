@@ -323,7 +323,7 @@ const Page = () => {
                       placeholder="Enter bank name"
                       value={billingFormData.bankName}
                       onChange={handleBillingChange}
-                      required
+                      readOnly
                     />
                   </div>
                   <div className="space-y-1">
@@ -334,7 +334,7 @@ const Page = () => {
                       placeholder="Enter Mpesa number"
                       value={billingFormData.mpesaNumber}
                       onChange={handleBillingChange}
-                      required
+                      readOnly
                     />
                   </div>
                   <div className="space-y-1">
@@ -345,7 +345,7 @@ const Page = () => {
                       placeholder="Enter account number"
                       value={billingFormData.bankAccount}
                       onChange={handleBillingChange}
-                      required
+                      readOnly
                     />
                   </div>
                   <div className="space-y-1">
@@ -356,7 +356,7 @@ const Page = () => {
                       placeholder="Enter approver name"
                       value={billingFormData.approverName}
                       onChange={handleBillingChange}
-                      required
+                      readOnly
                     />
                   </div>
                   <div className="space-y-1">
@@ -367,7 +367,7 @@ const Page = () => {
                       placeholder="Enter approver email"
                       value={billingFormData.approverEmail}
                       onChange={handleBillingChange}
-                      required
+                      readOnly
                     />
                   </div>
                   <div className="space-y-1">
@@ -378,7 +378,7 @@ const Page = () => {
                       placeholder="(+254...)"
                       value={billingFormData.approverContact}
                       onChange={handleBillingChange}
-                      required
+                      readOnly
                     />
                   </div>
                 </div>

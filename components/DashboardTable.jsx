@@ -35,6 +35,7 @@ import { Badge } from "./ui/badge";
 const DashboardTable = () => {
 
     const [customers, setCustomers] = useState([]);
+    const [formError, setFormError] = useState("")
   
   const token = getAccessToken();
   
