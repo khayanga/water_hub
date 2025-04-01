@@ -59,7 +59,7 @@ export function TransactionsChart() {
         if (data?.device_data?.length > 0) {
           const rawData = data.device_data[0];
 
-          // Extract and filter transactions for the selected month
+       
           const filteredData = [
             {
               name: "mpesa",
@@ -78,7 +78,7 @@ export function TransactionsChart() {
             },
           ];
 
-        //   console.log("Filtered Data:", filteredData);
+          // console.log("Filtered Data:", filteredData);
           setChartData(filteredData);
         }
       } catch (error) {

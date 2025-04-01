@@ -68,14 +68,9 @@ const Page = () => {
 
   const [availableFields, setAvailableFields] = useState([
     "Email",
-    "Address",
-    "Age",
-    "City",
-    "Country",
-    "Postal Code",
-    "Company",
-    "Job Title",
-    // Add more fields as needed
+    "Age group",
+    "Id Number",
+    "Gender",
   ]);
   const [selectedField, setSelectedField] = useState("");
   const [customers, setCustomers] = useState([]);
@@ -237,6 +232,7 @@ const Page = () => {
     }));
   };
 
+  
   const handleExtraFieldChange = (index, value) => {
     setFormData((prev) => {
       const updatedFields = [...prev.extraFields];
@@ -244,7 +240,6 @@ const Page = () => {
       return { ...prev, extraFields: updatedFields };
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
   
@@ -415,34 +410,69 @@ const Page = () => {
             </div>
 
              {/* Dynamic Extra Fields */}
+            
             {formData.extraFields.map((field, index) => (
               <div key={index} className="space-y-1">
                 <Label htmlFor={field.name}>{field.name}</Label>
-                <Input
-                type={field.name.toLowerCase() === "password" ? "password" : "text"}
-                placeholder={field.name}
-                value={field.value}
-                onChange={(e) => handleExtraFieldChange(index, e.target.value)}
-              />
+
+                {field.name === "Gender" ? (
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => handleExtraFieldChange(index, value)}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select Gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Female">Female</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : field.name === "Age group" ? (
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => handleExtraFieldChange(index, value)}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select Age Group" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="<20">&lt;20</SelectItem>
+                      <SelectItem value="<30">&lt;30</SelectItem>
+                      <SelectItem value="<40">&lt;40</SelectItem>
+                      <SelectItem value="<50">&lt;50</SelectItem>
+                      <SelectItem value="<60">&lt;60</SelectItem>
+                      <SelectItem value="<70">&lt;70</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    type="text"
+                    placeholder={field.name}
+                    value={field.value}
+                    onChange={(e) => handleExtraFieldChange(index, e.target.value)}
+                  />
+                )}
               </div>
-              
             ))}
+
+
             <div className="flex items-center space-x-2 md:space-x-4 mt-5   justify-start">
           
             <Select
-        value={selectedField}
-        onValueChange={(value) => setSelectedField(value)} // Corrected onChange
-      >
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Select Field" />
-        </SelectTrigger>
-        <SelectContent>
-          {availableFields.map((field) => (
-            <SelectItem key={field} value={field}>
-              {field}
-            </SelectItem>
-          ))}
-        </SelectContent>
+                value={selectedField}
+                onValueChange={(value) => setSelectedField(value)} 
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select Field" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableFields.map((field) => (
+                    <SelectItem key={field} value={field}>
+                      {field}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
             </Select>
             <Button
                 type="button"
@@ -622,17 +652,3 @@ const Page = () => {
 export default Page;
 
 
-{/* <form  " onSubmit={handleSubmit}>
-          <Card>
-            <CardContent >
-              
-              <div className="flex flex-wrap gap-8 p-2">
-                
-                
-                
-                
-              </div>
-            </CardContent>
-            
-          </Card>
-        </form> */}

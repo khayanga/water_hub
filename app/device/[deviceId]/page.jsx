@@ -31,6 +31,11 @@ export default  function Page() {
 
   const {toast} = useToast();
   const { deviceId } = useParams();
+  const token = getAccessToken();
+  const [tapSettings, setTapSettings] = useState({});
+  const [numTaps, setNumTaps] = useState(0);
+  const [valveType, setValveType] = useState("");
+  const [tapCalibration, setTapCalibration] = useState({});
 
   const [deviceData, setDeviceData] = useState(null);
   const [error, setError] = useState('');
@@ -69,6 +74,25 @@ export default  function Page() {
         if (response.ok) {
           const data = await response.json();
           setDeviceData(data.device);
+          const tapCount = parseInt(data.device.no_of_tap, 10) || 1;
+        setNumTaps(tapCount);
+
+        setValveType(data.device.valve_type); // Store valve type
+
+        // Initialize tap settings dynamically
+        const initialSettings = {};
+        for (let i = 1; i <= tapCount; i++) {
+          initialSettings[`tap_unit_price_${i}`] = "";
+          initialSettings[`min_tap_unit_price_${i}`] = "";
+        }
+        setTapSettings(initialSettings);
+
+        const initialCalibration = {};
+        for (let i = 1; i <= tapCount; i++) {
+          initialCalibration[`tap_unit_pulse_${i}`] = "";
+          initialCalibration[`tap_unit_volume_${i}`] = "";
+        }
+        setTapCalibration(initialCalibration);
          
         } else {
           setError("Failed to fetch device details");
@@ -80,6 +104,121 @@ export default  function Page() {
 
     fetchDevice();
   }, [deviceId]);
+
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setTapSettings((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+ // Handle calibration input changes
+ const handleCalibrationChange = (e) => {
+  const { id, value } = e.target;
+  setTapCalibration((prevCalibration) => ({
+    ...prevCalibration,
+    [id]: value,
+  }));
+};
+
+
+  const handleSubmitTapSettings = async (e) => {
+    e.preventDefault();
+  
+    if (!valveType) {
+      toast({ title: "Error", description: "Valve type not provided." });
+      return;
+    }
+  
+    if (!deviceId) {
+      toast({ title: "Error", description: "Device ID is missing." });
+      return;
+    }
+  
+    const endpoint =
+      valveType === "solenoid"
+        ? `https://api.waterhub.africa/api/v1/client/device/solenoid/tap-settings/${deviceId}`
+        : `https://api.waterhub.africa/api/v1/client/device/mbv/settings/${deviceId}`;
+  
+    const payload = {};
+    for (let i = 1; i <= numTaps; i++) {
+      payload[`tap_unit_price_${i}`] = Number(tapSettings[`tap_unit_price_${i}`]) || 0;
+      payload[`min_tap_unit_price_${i}`] = Number(tapSettings[`min_tap_unit_price_${i}`]) || 0;
+    }
+  
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      const result = await response.json();
+  
+      if (response.ok) {
+        toast({ title: "Success", description: "Tap settings updated successfully!" });
+      } else {
+        toast({ title: "Error", description: result?.message || "Failed to update tap settings." });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "An error occurred while updating tap settings." });
+    }
+  };
+
+
+  const handleSubmitCalibration = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (!valveType) {
+      toast({ title: "Error", description: "Valve type not provided." });
+      return;
+    }
+  
+    if (!deviceId) {
+      toast({ title: "Error", description: "Device ID is missing." });
+      return;
+    }
+    const endpoint =
+      valveType === "solenoid"
+        ? `https://api.waterhub.africa/api/v1/client/device/solenoid/callibration/${deviceId}`
+        : `https://api.waterhub.africa/api/v1/client/device/mbv/callibration/${deviceId}`;
+  
+    const payload = {};
+    for (let i = 1; i <= numTaps; i++) {
+      payload[`tap_unit_pulse_${i}`] = Number(tapCalibration[`tap_unit_pulse_${i}`]) || 0;
+      payload[`min_tap_unit_volume_${i}`] = Number(tapCalibration[`min_tap_unit_volume_${i}`]) || 0;
+    }
+  
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      const result = await response.json();
+  
+      if (response.ok) {
+        toast({ title: "Success", description: "Tap calllibration updated successfully!" });
+      } else {
+        toast({ title: "Error", description: result?.message || "Failed to update tap callibration." });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "An error occurred while updating tap callibration." });
+    }
+  };
+
 
     const handleApiKeysInputChange = useCallback((e) => {
       const { id, value } = e.target;
@@ -181,20 +320,98 @@ export default  function Page() {
           </TabsContent>
           
           {/* Tap settings */}
-        <TabsContent value="tap-settings" >
-            <Tapsettings deviceId={deviceId} valveType={deviceData?.valve_type} />
-              
-              
-            </TabsContent >
-       
+        
+          <form onSubmit={handleSubmitTapSettings} className="w-full md:max-w-2xl mt-5 pl-2">
+            <TabsContent value="tap-settings">
+              <Card>
+                <CardContent className="space-y-2">
+                  {[...Array(numTaps)].map((_, index) => {
+                    const tapNumber = index + 1;
+                    return (
+                      <div key={tapNumber} className="flex flex-wrap gap-8 p-2">
+                        <div className="space-y-1">
+                          <Label htmlFor={`tap_unit_price_${tapNumber}`}>Tap {tapNumber} - Unit Price/Liter (KES)</Label>
+                          <Input
+                            id={`tap_unit_price_${tapNumber}`}
+                            type="text"
+                            placeholder="Enter unit price"
+                            value={tapSettings[`tap_unit_price_${tapNumber}`] || ""}
+                            onChange={handleInputChange}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label htmlFor={`min_tap_unit_price_${tapNumber}`}>Tap {tapNumber} - Min Dispense Price (KES)</Label>
+                          <Input
+                            id={`min_tap_unit_price_${tapNumber}`}
+                            type="text"
+                            placeholder="Enter min dispense price"
+                            value={tapSettings[`min_tap_unit_price_${tapNumber}`] || ""}
+                            onChange={handleInputChange}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </CardContent>
+                <CardFooter>
+                  <Button type="submit" className="bg-blue-500 text-white">
+                    Update Tap Settings
+                  </Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+          </form>
 
 
           {/* Tap callibration */}
-         <TabsContent value="tap-callibration" >
-              <TapCallibration deviceId={deviceId} valveType={deviceData?.valve_type} /> 
-              
+         
+          <form onSubmit={handleSubmitCalibration} className="w-full md:max-w-2xl mt-5 pl-2">
+            <TabsContent value="tap-callibration">
+              <Card>
+                <CardContent className="space-y-2">
+                  {/* Dynamically render tap calibration fields */}
+                  {Array.from({ length: numTaps }).map((_, index) => {
+                    const tapNumber = index + 1;  // Tap number starts from 1
+
+                    return (
+                      <div key={tapNumber} className="flex flex-wrap gap-8 p-2">
+                        <div className="space-y-1">
+                          <Label htmlFor={`tap_unit_pulse_${tapNumber}`}>
+                            Tap No {tapNumber} - Unit Pulse/Liter
+                          </Label>
+                          <Input
+                            placeholder="Enter unit pulse"
+                            id={`tap_unit_pulse_${tapNumber}`}
+                            type="text"
+                            value={tapCalibration[`tap_unit_pulse_${tapNumber}`] || ""}
+                            onChange={handleCalibrationChange}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label htmlFor={`tap_unit_volume_${tapNumber}`}>
+                            Tap No {tapNumber} - Unit Volume in Litres
+                          </Label>
+                          <Input
+                            placeholder="Enter unit volume"
+                            id={`tap_unit_volume_${tapNumber}`}
+                            type="text"
+                            value={tapCalibration[`tap_unit_volume_${tapNumber}`] || ""}
+                            onChange={handleCalibrationChange}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </CardContent>
+                <CardFooter>
+                  <Button type="submit" className="bg-blue-500 text-white">
+                    Update Tap Calibration
+                  </Button>
+                </CardFooter>
+              </Card>
             </TabsContent>
-          
+          </form>
+
 
 
           <form onSubmit={handleSubmitApiKeys} className="  w-full md:max-w-2xl  mt-5 pl-2">
