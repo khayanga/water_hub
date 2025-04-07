@@ -43,12 +43,10 @@ const SignIn = () => {
       console.log("Response OK:", response.ok, "Result:", result);
 
       if (response.ok && result.access_token) {
-        console.log(`Access Token: ${result.access_token}`);
         localStorage.setItem('accessToken', result.access_token);
         sessionStorage.setItem('user', JSON.stringify(result.data));
         login(result.data);
-        // setEmail("");
-        // setPassword(""); 
+        
       } else {
         setError(result.message || 'Failed to sign in. Please check your email and password.');
       }

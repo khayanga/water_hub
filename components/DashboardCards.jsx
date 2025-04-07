@@ -78,7 +78,7 @@ const DashboardCards = () => {
             );
     
             
-            console.log("Wallet balance:", response.data.data);
+            // console.log("Wallet balance:", response.data.data);
     
           
             if (response.data.message === "Success") {
@@ -152,7 +152,7 @@ const DashboardCards = () => {
               }
             );
     
-            console.log("Analytics API response:", response.data);
+            // console.log("Analytics API response:", response.data);
             setAnalyticsData(response.data); 
           } catch (error) {
             console.error("Error fetching analytics data:", error);
@@ -181,7 +181,7 @@ const DashboardCards = () => {
               setDevices(response.data.data); 
             }
 
-            consle.log("Device serials", response.data.data)
+            // consle.log("Device serials", response.data.data)
           } catch (error) {
             console.error("Error fetching devices:", error);
           }
@@ -214,7 +214,7 @@ const DashboardCards = () => {
           );
           
           if (response.data.message === 'Success, withdrawal request initiated, await approval') {
-            console.log('Withdrawal request successful!');
+            // console.log('Withdrawal request successful!');
             setRemarks("")
             setWithdrawAmount("")
             setRequesterPhone("")
